@@ -23,13 +23,24 @@ Ordem das cartas
 
 #define TAM_MAX_ESTADO      1024
 
-#define FORMATO             "%llx_%llx_%llx_%llx"
+#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
-#define FORMATO2             "q=%llx_%llx_%llx_%llx"
+typedef long long int MAO;
+struct state
+{
+  MAO mao[4];
+  MAO selecao;
+  int cartas[4];
+  int action , passar, selecionar;
+};
 
-void shuffle (long long unsigned int *fourhands);
+typedef struct state ESTADO;
 
-char *da_estado(long long unsigned int *mao);
+ESTADO shuffle (ESTADO e);
+
+char* estado2str (ESTADO e);
+
+ESTADO str2estado (char* str);
 
 /**
 	Estado inicial com todas as 52 cartas do baralho
@@ -56,9 +67,9 @@ int indice(int naipe, int valor) {
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		O novo estado
 */
-long long int add_carta(long long int ESTADO, int naipe, int valor) {
+long long int add_carta(long long int est, int naipe, int valor) {
 	int idx = indice(naipe, valor);
-	return ESTADO | ((long long int) 1 << idx);
+	return est | ((long long int) 1 << idx);
 }
 
 /** \brief Remove uma carta do estado
@@ -68,9 +79,9 @@ long long int add_carta(long long int ESTADO, int naipe, int valor) {
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		O novo estado
 */
-long long int rem_carta(long long int ESTADO, int naipe, int valor) {
+long long int rem_carta(long long int est, int naipe, int valor) {
 	int idx = indice(naipe, valor);
-	return ESTADO & ~((long long int) 1 << idx);
+	return est & ~((long long int) 1 << idx);
 }
 
 /** \brief Verifica se uma carta pertence ao estado
@@ -80,9 +91,9 @@ long long int rem_carta(long long int ESTADO, int naipe, int valor) {
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		1 se a carta existe e 0 caso contrário
 */
-int carta_existe(long long int ESTADO, int naipe, int valor) {
+int carta_existe(long long int est, int naipe, int valor) {
 	int idx = indice(naipe, valor);
-	return (ESTADO >> idx) & 1;
+	return (est >> idx) & 1;
 }
 
 /** \brief Imprime o html correspondente a uma carta
@@ -94,17 +105,57 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
-void imprime_carta(char *path, int x, int y, long long unsigned int *fourhands, int m, int naipe, int valor) {
+void imprime_carta(int x, int y, ESTADO e , int m , int naipe, int valor) {
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
-	long long unsigned int tfourhands[4] = {fourhands [0] , fourhands [1] , fourhands [2] , fourhands [3]};
 
-	rem_carta(tfourhands[m], naipe, valor);
+	 if (carta_existe (e.selecao , naipe , valor)) y -= 30;
+	
+	//e.mao[m] = rem_carta(e.mao[m], naipe , valor);
 
-	sprintf(script, "%s?q=%s", SCRIPT, da_estado(tfourhands));
+	 if (m == 3){
+	 	if (carta_existe (e.selecao , naipe , valor)) e.selecao = rem_carta (e.selecao , naipe , valor);
+	 	else e.selecao = add_carta(e.selecao , naipe , valor);
+	 }
+
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 	/*sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));*/
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
+}
+
+void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
+
+	int n, v;
+
+	for(x = 10, v = 0; v < 13; v++){
+		for(n = 0; n < 4; n++){
+			if(carta_existe(mao , n , v)){
+				x += 20;
+				imprime_carta(x , y , e , m , n , v);
+			}
+		}
+	}
+}
+
+void imprime_botoes (int x , int y, ESTADO e){
+
+	/*sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));*/
+
+	e.action = 1;
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+	
+	e.action = 2;
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+	
+	e.action = 3;
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+
+	//para criar imagem sem link
+	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", script, x, y, BARALHO, "botao_jogar.png");
 }
 
 /** \brief Imprime o estado
@@ -113,24 +164,24 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param path	o URL correspondente à pasta que contém todas as cartas
 @param ESTADO	O estado atual
 */
-void imprime(char *path, long long unsigned int *fourhands) {
-	int n, v, m;
-	int x, y;
+void imprime(ESTADO e){
 
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
-	for(y = 10, m = 0; m < 4; m++, y += 120){
+	if (e.action == 2){
+		imprime_mao (400 , 400 , e , e.selecao , 4);
+		e.selecao = 0;
+	}
 
-		for(x = 10, v = 0; v < 13; v++){
-			for(n = 0; n < 4; n++){
-				if(carta_existe(fourhands[m], n, v)) {
-					x += 20;
-					imprime_carta(path, x, y, fourhands, m , n, v);
-					}
-				}
-			}
-		}
+	imprime_mao (10 , 010 , e , e.mao[0] , 0);
+	imprime_mao (10 , 130 , e , e.mao[1] , 1);
+	imprime_mao (10 , 250 , e , e.mao[2] , 2);
+
+/*	printf("<p>ESTADO = %s</p>\n", estado2str (e)); */
+	imprime_mao (10 , 400 , e , e.mao[3] , 3);
+	imprime_botoes (10 , 550 , e);
+
 	printf("</svg>\n");
 }
 
@@ -142,26 +193,23 @@ Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e 
 Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
 @param query A query que é passada à cgi-bin
  */
-void parse(char *query , long long unsigned int *fourhands) {
+void parse(char *query , ESTADO e){
 
-	long long int x;
-
-	if(sscanf(query, "q=%lld", &x) == 1) {
-		imprime(BARALHO, fourhands);
-	} else {
-
-		shuffle (fourhands);
-
-		imprime(BARALHO, fourhands);
+	if (strlen (query) == 0){
+		e = shuffle (e);
+		e.action = 0;
+		printf("<p>ESTADO = %s</p>\n", estado2str (e));
 	}
+	else e = str2estado (query);  
+	e.action = 0;
+
+	imprime(e);
 }
 
 
-void shuffle (long long unsigned int *fourhands){
+ESTADO shuffle (ESTADO e){
 
 	int naipe, valor, randN;
-
-	int countmaos [4] = {0};
 
 	srandom (time (NULL));
 
@@ -171,50 +219,47 @@ void shuffle (long long unsigned int *fourhands){
 
 			randN = random()%4;
 
-			while (countmaos[randN] == 13)
+			while (e.cartas[randN] == 13)
 				randN = random() % 4; 
 
-			countmaos[randN]++;
+			e.cartas[randN]++;
 
-			fourhands [randN] = add_carta(fourhands[randN] , naipe , valor);
+			e.mao[randN] = add_carta(e.mao[randN] , naipe , valor);
 
 		}
 
 	}
 
+	return e;
 }
 
-
-int le_estado(char *estado, long long unsigned int *mao) {
-    if(estado == NULL || strlen(estado) == 0)
-        return 0;
-    return sscanf(estado, FORMATO2, mao, mao + 1, mao + 2, mao + 3);
+ESTADO str2estado (char* str) {
+	ESTADO e;
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.passar, &e.selecionar, &e.action);
+	return e;
 }
 
-char *da_estado(long long unsigned int *mao) {
-    char *estado = NULL;
-    estado = (char *) malloc (TAM_MAX_ESTADO);
-    sprintf(estado, FORMATO, mao[0], mao[1], mao[2], mao[3]);
-    return estado;
+char* estado2str (ESTADO e){
+	static char res[10240];
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.passar, e.selecionar, e.action);
+	return res;
 }
 
-/*int main() {
-    long long unsigned int mao[4] = {0};
-    char *estado;
-    int i;
+#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
-    printf("Content-Type: text/html; charset=utf-8\n\n");
+ESTADO inicializa (ESTADO e){
 
-    le_estado(getenv("QUERY_STRING"), mao);
-
-    estado = da_estado(mao);
-
-    printf("<p>estado = %s</p>\n", estado);
-    for(i = 0; i < 4; i++) {
-        printf("<p>mao[%d] = %llu</p>\n", i, mao[i]);
+	int i;
+    for (i = 0 ; i < 4 ; i++){
+    	e.mao[i]=0;
+    	e.cartas[i]=0;
     }
-*/
+    e.selecao = 0; 
+    e.action = 1;
+    e.passar = e.selecionar = 0;
 
+    return e;
+}
 
 /** \brief Função principal
 
@@ -223,9 +268,7 @@ a função que vai imprimir o código html para desenhar as cartas
  */
 int main() {
 
-	long long unsigned int fourhands [4] = {0};
-	char *estado;
-	int i;
+	ESTADO est;
 	
 	/** Cabeçalhos necessários numa CGI
  */
@@ -235,21 +278,12 @@ int main() {
 
 	printf("<h1>Exemplo de utilização</h1>\n");
 
-    le_estado(getenv("QUERY_STRING"), fourhands);
+	if (strlen (getenv("QUERY_STRING")) == 0) est = inicializa (est);	
 
-   estado = da_estado(fourhands);
-
-    printf("<p>estado = %s</p>\n", estado);
-    for(i = 0; i < 4; i++) {
-        printf("<p>mao[%d] = %llu</p>\n", i, fourhands[i]);
-    	}
-
-	
-
-/*
- * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
+/**
+ Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
-	parse(getenv("QUERY_STRING") , fourhands);
+	parse(getenv("QUERY_STRING") , est);
 
 	printf("</body>\n");
 
