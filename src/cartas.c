@@ -155,8 +155,9 @@ void imprime_botoes (int x , int y, ESTADO e){
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
 
-	//para criar imagem sem link
+	/*para criar imagem sem link
 	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
+	*/
 }
 
 /** \brief Imprime o estado
