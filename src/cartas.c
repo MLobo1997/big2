@@ -23,7 +23,7 @@ Ordem das cartas
 
 #define TAM_MAX_ESTADO      1024
 
-#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
+#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d_%lld_%lld_%lld_%lld"
 
 typedef long long int MAO;
 
@@ -42,6 +42,8 @@ ESTADO shuffle (ESTADO e);
 char* estado2str (ESTADO e);
 
 ESTADO str2estado (char* str);
+
+ESTADO inicializa (ESTADO e);
 
 /**
 	Estado inicial com todas as 52 cartas do baralho
@@ -83,6 +85,50 @@ long long int rem_carta(long long int est, int naipe, int valor) {
 	int idx = indice(naipe, valor);
 	return est & ~((long long int) 1 << idx);
 }
+
+/** \brief Elimina todas as cartas de uma determinada seleção numa mao
+@param mao 		Mao a que se vão retirar as cartas
+@param selecao 	Seleçao de cartas que são retiradas
+*/
+
+MAO rem_cartas(MAO est , MAO rem){
+
+	rem = ~rem;
+
+	est = est & rem;
+
+	return est;
+}
+
+/** \brief Conta o número de cartas presentes numa mão
+
+*/
+
+int bitsOne (MAO sel){
+
+
+	int nCartas, count;
+
+	for (nCartas = count = 0; count < 56 ; sel = sel >> 1 , count++)
+			if (sel & ((MAO) 1)) nCartas++;
+
+	return nCartas;
+
+}
+
+/** Verifica se uma determinada jogada é valida*/ /*AINDA É PROVISORIA, APENAS VERIFICA SE FOR SÓ UMA CARTA*/
+
+int verificaJogada (MAO sel){
+
+	int nCartas, flag = 0;
+
+	nCartas = bitsOne (sel);
+
+	if (nCartas == 1) flag = 1;
+
+	return flag;
+}
+
 
 /** \brief Verifica se uma carta pertence ao estado
 
@@ -151,25 +197,30 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 	char script[10240];
 
+
 	e.action = 2;
-	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
+
+		if (verificaJogada (e.selecao)){
+
+			sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+			printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
+		}
+
+		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
 
 	y += 70;
 
 	e.action = 3;
-	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
+		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
 	
 	y += 70;
 
 	e.action = 1;
-	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
+		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
 	
-	/*para criar imagem sem link
-	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
-	*/
+	e.action = 0;
 }
 
 /** \brief Imprime o estado
@@ -183,42 +234,35 @@ void imprime(ESTADO e){
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
-	if (e.action == 2){
-		imprime_mao (400 , 400 , e , e.selecao , 4);
+	if (e.action == 2){ /*JOGAR*/
+		e.played[3] = e.selecao;
+		e.mao[3] = rem_cartas (e.mao[3] , e.selecao);
 		e.selecao = 0;
+	}
+
+	if (e.action == 1){ /*BARALHAR*/
+		e = inicializa (e);
+		e = shuffle (e);
 	}
 
 	imprime_mao (150 , 010 , e , e.mao[0] , 0);
 	imprime_mao (350 , 010 , e , e.mao[1] , 1);
 	imprime_mao (550 , 010 , e , e.mao[2] , 2);
+	imprime_mao (070 , 650 , e , e.mao[3] , 3);
 
-/*	printf("<p>ESTADO = %s</p>\n", estado2str (e)); */
-	imprime_mao (70 , 650 , e , e.mao[3] , 3);
+	/*Imprime as cartas que estão em jogo*/
+
+	imprime_mao (400 , 400 , e , e.played[0] , 4);
+	imprime_mao (400 , 400 , e , e.played[1] , 5);
+	imprime_mao (400 , 400 , e , e.played[2] , 6);
+	imprime_mao (400 , 400 , e , e.played[3] , 7);
+
+
 	imprime_botoes (700 , 550 , e);
 
 	printf("</svg>\n");
 }
 
-/** \brief Trata os argumentos da CGI
-
-Esta função recebe a query que é passada à cgi-bin e trata-a.
-Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
-Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
-Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
-@param query A query que é passada à cgi-bin
- */
-void parse(char *query , ESTADO e){
-
-	if (strlen (query) == 0){
-		e = shuffle (e);
-		e.action = 0;
-		printf("<p>ESTADO = %s</p>\n", estado2str (e)); /*da print do estado*/
-	}
-	else e = str2estado (query);  
-	e.action = 0;
-
-	imprime(e);
-}
 
 
 ESTADO shuffle (ESTADO e){
@@ -249,17 +293,16 @@ ESTADO shuffle (ESTADO e){
 
 ESTADO str2estado (char* str) {
 	ESTADO e;
-	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.passar, &e.selecionar, &e.action);
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.passar, &e.selecionar, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3]);
 	return e;
 }
 
 char* estado2str (ESTADO e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.passar, e.selecionar, e.action);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.passar, e.selecionar, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3]);
 	return res;
 }
 
-#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
 ESTADO inicializa (ESTADO e){
 
@@ -267,12 +310,31 @@ ESTADO inicializa (ESTADO e){
     for (i = 0 ; i < 4 ; i++){
     	e.mao[i]=0;
     	e.cartas[i]=0;
+    	e.played[i]=0;
     }
     e.selecao = 0; 
-    e.action = 1;
+    e.action = 0;
     e.passar = e.selecionar = 0;
 
     return e;
+}
+
+/** \brief Trata os argumentos da CGI
+
+Esta função recebe a query que é passada à cgi-bin e trata-a.
+Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
+Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
+Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
+@param query A query que é passada à cgi-bin
+ */
+void parse(char *query , ESTADO e){
+
+	if (strlen (query) == 0)
+		e = shuffle (e);
+
+	else e = str2estado (query); 
+
+	imprime(e);
 }
 
 /** \brief Função principal
