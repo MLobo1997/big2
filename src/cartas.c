@@ -47,7 +47,6 @@ ESTADO str2estado (char* str);
 	Cada carta é representada por um bit que está
 	a 1 caso ela pertença à mão ou 0 caso contrário
 */
-/*const long long int ESTADO_INICIAL = 0xfffffffffffff; */
 
 
 /** \brief Devolve o índice da carta
@@ -105,19 +104,19 @@ int carta_existe(long long int est, int naipe, int valor) {
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
-void imprime_carta(int x, int y, ESTADO e , int m , int naipe, int valor) {
+void imprime_carta(int x, int y, ESTADO e , int m , int naipe, int valor){
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
 
-	 if (carta_existe (e.selecao , naipe , valor)) y -= 30;
+	if (carta_existe (e.selecao , naipe , valor)) y -= 30;
 	
-	//e.mao[m] = rem_carta(e.mao[m], naipe , valor);
+	/* e.mao[m] = rem_carta(e.mao[m], naipe , valor); */
 
-	 if (m == 3){
-	 	if (carta_existe (e.selecao , naipe , valor)) e.selecao = rem_carta (e.selecao , naipe , valor);
-	 	else e.selecao = add_carta(e.selecao , naipe , valor);
-	 }
+	if (m == 3){
+		if (carta_existe (e.selecao , naipe , valor)) e.selecao = rem_carta (e.selecao , naipe , valor);
+		else e.selecao = add_carta(e.selecao , naipe , valor);
+	}
 
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 	/*sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));*/
@@ -142,20 +141,22 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 	/*sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));*/
 
+	char script[10240];
+
 	e.action = 1;
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
 	
 	e.action = 2;
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
 	
 	e.action = 3;
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "botao_jogar.png");
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
 
 	//para criar imagem sem link
-	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", script, x, y, BARALHO, "botao_jogar.png");
+	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
 }
 
 /** \brief Imprime o estado
@@ -273,10 +274,10 @@ int main() {
 	/** Cabeçalhos necessários numa CGI
  */
 	printf("Content-Type: text/html; charset=utf-8\n\n");
-	printf("<header><title>Exemplo</title></header>\n");
+	printf("<header><title>Big2</title></header>\n");
 	printf("<body>\n");
 
-	printf("<h1>Exemplo de utilização</h1>\n");
+	printf("<h1>Big2</h1>\n");
 
 	if (strlen (getenv("QUERY_STRING")) == 0) est = inicializa (est);	
 
