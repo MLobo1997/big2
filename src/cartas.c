@@ -26,10 +26,11 @@ Ordem das cartas
 #define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
 typedef long long int MAO;
-struct state
-{
+
+struct state{
   MAO mao[4];
   MAO selecao;
+  MAO played[4];
   int cartas[4];
   int action , passar, selecionar;
 };
@@ -127,14 +128,21 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 
 	int n, v;
 
-	for(x = 10, v = 0; v < 13; v++){
-		for(n = 0; n < 4; n++){
-			if(carta_existe(mao , n , v)){
-				x += 20;
-				imprime_carta(x , y , e , m , n , v);
+	if (m == 3)	for(v = 0 ; v < 13 ; v++)
+					for(n = 0; n < 4; n++){
+						if(carta_existe(mao , n , v)){
+							x += 40;
+							imprime_carta(x , y , e , m , n , v);
+						}
+					}
+	else for (v = 0 ; v < 13 ; v++)
+			for (n = 0 ; n < 4 ; n++){
+				if(carta_existe(mao , n , v)){
+					y += 20;
+					imprime_carta (x , y , e , m , n , v);
+				}
+
 			}
-		}
-	}
 }
 
 void imprime_botoes (int x , int y, ESTADO e){
@@ -143,18 +151,22 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 	char script[10240];
 
-	e.action = 1;
-	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
-	
 	e.action = 2;
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
-	
+
+	y += 70;
+
 	e.action = 3;
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
+	
+	y += 70;
 
+	e.action = 1;
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
+	
 	/*para criar imagem sem link
 	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
 	*/
@@ -176,13 +188,13 @@ void imprime(ESTADO e){
 		e.selecao = 0;
 	}
 
-	imprime_mao (10 , 010 , e , e.mao[0] , 0);
-	imprime_mao (10 , 130 , e , e.mao[1] , 1);
-	imprime_mao (10 , 250 , e , e.mao[2] , 2);
+	imprime_mao (150 , 010 , e , e.mao[0] , 0);
+	imprime_mao (350 , 010 , e , e.mao[1] , 1);
+	imprime_mao (550 , 010 , e , e.mao[2] , 2);
 
 /*	printf("<p>ESTADO = %s</p>\n", estado2str (e)); */
-	imprime_mao (10 , 400 , e , e.mao[3] , 3);
-	imprime_botoes (10 , 550 , e);
+	imprime_mao (70 , 650 , e , e.mao[3] , 3);
+	imprime_botoes (700 , 550 , e);
 
 	printf("</svg>\n");
 }
@@ -200,7 +212,7 @@ void parse(char *query , ESTADO e){
 	if (strlen (query) == 0){
 		e = shuffle (e);
 		e.action = 0;
-		printf("<p>ESTADO = %s</p>\n", estado2str (e));
+		printf("<p>ESTADO = %s</p>\n", estado2str (e)); /*da print do estado*/
 	}
 	else e = str2estado (query);  
 	e.action = 0;
