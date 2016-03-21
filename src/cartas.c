@@ -126,6 +126,8 @@ int verificaJogada (MAO sel){
 
 	if (nCartas == 1) flag = 1;
 
+	if (nCartas == 2) flag = 1;
+
 	return flag;
 }
 
@@ -174,7 +176,7 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 
 	int n, v;
 
-	if (m == 3)	for(v = 0 ; v < 13 ; v++)
+	if (m >= 3)	for(v = 0 ; v < 13 ; v++)
 					for(n = 0; n < 4; n++){
 						if(carta_existe(mao , n , v)){
 							x += 40;
@@ -234,16 +236,17 @@ void imprime(ESTADO e){
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
+	if (e.action == 1){ /*BARALHAR*/
+		e = inicializa (e);
+		e = shuffle (e);
+	}
+	
 	if (e.action == 2){ /*JOGAR*/
 		e.played[3] = e.selecao;
 		e.mao[3] = rem_cartas (e.mao[3] , e.selecao);
 		e.selecao = 0;
 	}
 
-	if (e.action == 1){ /*BARALHAR*/
-		e = inicializa (e);
-		e = shuffle (e);
-	}
 
 	imprime_mao (150 , 010 , e , e.mao[0] , 0);
 	imprime_mao (350 , 010 , e , e.mao[1] , 1);
@@ -255,7 +258,7 @@ void imprime(ESTADO e){
 	imprime_mao (400 , 400 , e , e.played[0] , 4);
 	imprime_mao (400 , 400 , e , e.played[1] , 5);
 	imprime_mao (400 , 400 , e , e.played[2] , 6);
-	imprime_mao (400 , 400 , e , e.played[3] , 7);
+	imprime_mao (300 , 520 , e , e.played[3] , 7);
 
 
 	imprime_botoes (700 , 550 , e);
