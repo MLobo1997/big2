@@ -100,37 +100,6 @@ MAO rem_cartas(MAO est , MAO rem){
 	return est;
 }
 
-/** \brief Conta o número de cartas presentes numa mão
-
-*/
-
-int bitsOne (MAO sel){
-
-
-	int nCartas, count;
-
-	for (nCartas = count = 0; count < 56 ; sel = sel >> 1 , count++)
-			if (sel & ((MAO) 1)) nCartas++;
-
-	return nCartas;
-
-}
-
-/** Verifica se uma determinada jogada é valida*/ /*AINDA É PROVISORIA, APENAS VERIFICA SE FOR SÓ UMA CARTA*/
-
-int verificaJogada (MAO sel){
-
-	int nCartas, flag = 0;
-
-	nCartas = bitsOne (sel);
-
-	if (nCartas == 1) flag = 1;
-
-	if (nCartas == 2) flag = 1;
-
-	return flag;
-}
-
 
 /** \brief Verifica se uma carta pertence ao estado
 
@@ -165,32 +134,39 @@ void imprime_carta(int x, int y, ESTADO e , int m , int naipe, int valor){
 	if (m == 3){
 		if (carta_existe (e.selecao , naipe , valor)) e.selecao = rem_carta (e.selecao , naipe , valor);
 		else e.selecao = add_carta(e.selecao , naipe , valor);
-	}
 
 	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-	/*sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));*/
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
+	}
+	else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" />\n", x, y, BARALHO, rank[valor], suit[naipe]);
 }
 
 void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 
 	int n, v;
 
-	if (m >= 3)	for(v = 0 ; v < 13 ; v++)
+	if (m == 3)	for(v = 0 ; v < 13 ; v++)
 					for(n = 0; n < 4; n++){
 						if(carta_existe(mao , n , v)){
 							x += 40;
 							imprime_carta(x , y , e , m , n , v);
 						}
 					}
-	else for (v = 0 ; v < 13 ; v++)
-			for (n = 0 ; n < 4 ; n++){
-				if(carta_existe(mao , n , v)){
-					y += 20;
-					imprime_carta (x , y , e , m , n , v);
-				}
+	if (m >= 4) for(v = 0 ; v < 13 ; v++)
+					for(n = 0; n < 4; n++){
+						if(carta_existe(mao , n , v)){
+							x += 77;
+							imprime_carta(x , y , e , m , n , v);
+						}
+					}
+	if (m <= 2) for (v = 0 ; v < 13 ; v++)
+					for (n = 0 ; n < 4 ; n++){
+						if(carta_existe(mao , n , v)){
+							y += 20;
+							imprime_carta (x , y , e , m , n , v);
+						}
 
-			}
+					}
 }
 
 void imprime_botoes (int x , int y, ESTADO e){
