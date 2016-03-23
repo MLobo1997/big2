@@ -86,6 +86,73 @@ int numCartas (MAO sel){
 	return nCartas;
 }
 
+void insert (int v[] , int N , int x){
+
+	int i;
+
+	for (i = 0 ; x > v[i] && i < N ; i++);
+
+	while (i < N){
+		v[N] = v[N - 1];
+		N--;
+	}
+
+	v[i] = x;
+}
+
+void insertSort (int v[] , int N){
+
+	int i;
+
+	for (i = 0 ; i < N ; i++)
+		insert (v , i , v[i]);
+
+}
+
+/** \brief Recebe dois valores de cartas e verifica se são seguidas
+*/
+int verificaSeguidos (int n1 , int n2){
+
+	int flag = 0;
+
+	if (n1 + 1 == n2 || n1 == n2 + 1) flag = 1;
+
+	if ((n1 == 12 && n2 == 0) || (n1 == 0 && n2 == 12)) flag = 1; /*Para o caso de uma ser um 3 e outra 2*/
+
+	return flag;
+}
+
+int sequencia (char cartas[3][56]){
+
+	int valores[5], tmp[5];
+	int i, n, ntmp, flag = 0;
+
+	for (i = 0 ; i < 5 ; i++)
+		valores[i] = returnValue(cartas[i]);
+
+	insertSort (valores , 5);
+
+	for (i = 0 ; i + 1 < 5 && verificaSeguidos (valores[i] , valores[i + 1]) ; i++);
+
+	if (i == 4) flag = 1;
+
+	else{
+		for (n = 0 , i++ ; i < 5 ; n++, i++)
+			tmp[n] = valores[i];
+		for (i = 0, ntmp = 5 ; n < 5 ; n++, i++, ntmp--)
+			valores[ntmp] = valores[n]; //É AQUI QUE ESCACHA
+		for (n = 0 ; n < i ; n++)
+			valores[n] = tmp[n];
+
+
+		for (i = 0 ; i + 1 < 5 && verificaSeguidos (valores[i] , valores[i + 1]) ; i++);
+
+		if (i == 4) flag = 1;
+	}
+
+	return flag;
+}
+
 /** Verifica se uma determinada jogada é valida*/ 
 
 int verificaJogada (MAO mao){
@@ -102,9 +169,7 @@ int verificaJogada (MAO mao){
 
 	if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
 
-	if (nCartas == 4);
-
-	if (nCartas == 5);
+	if (nCartas == 5) if (sequencia (cartas)) flag = 1;
 
 	return flag; 
 
@@ -136,6 +201,28 @@ int main (){
 	n = returnNaipe("2_S");
 
 	printf("%d\n", n);
+
+	return 0;
+}
+*/
+
+/*
+int main (){
+
+	int array[1000], N, i;
+
+	printf("Elementos?:\n");
+	scanf ("%d" , &N);
+
+	for (i = 0 ; i < N ; i++){
+		printf("Elemento nº%d\n", i);
+		scanf ("%d" , &array[i]);
+	}
+
+	insertSort (array , N);
+
+	for (i = 0 ; i < N ; i++)
+		printf("%d\n" , array[i]);
 
 	return 0;
 }
