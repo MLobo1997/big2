@@ -139,9 +139,9 @@ int sequencia (char cartas[3][56]){
 	else{
 		for (n = 0 , i++ ; i < 5 ; n++, i++)
 			tmp[n] = valores[i];
-		for (i = 0, ntmp = 5 ; n < 5 ; n++, i++, ntmp--)
-			valores[ntmp] = valores[n]; //É AQUI QUE ESCACHA
-		for (n = 0 ; n < i ; n++)
+		for (i = 0, ntmp = 4 , n = 4 - n ; n >= 0 ; n--, i++, ntmp--)
+			valores[ntmp] = valores[n];
+		for (n = 0 , i = 4 - i ; n <= i  ; n++)
 			valores[n] = tmp[n];
 
 
@@ -151,6 +151,18 @@ int sequencia (char cartas[3][56]){
 	}
 
 	return flag;
+}
+
+int flush (char cartas[3][56]){
+
+	int naipes[5], i;
+
+	for (i = 0 ; i < 5 ; i++)
+		naipes[i] = returnNaipe (cartas[i]);
+
+	for (i = 0 ; i + 1 < 5 && (naipes[i] == naipes[i + 1]) ; i++);
+
+	return (i == 4);
 }
 
 /** Verifica se uma determinada jogada é valida*/ 
@@ -169,7 +181,7 @@ int verificaJogada (MAO mao){
 
 	if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
 
-	if (nCartas == 5) if (sequencia (cartas)) flag = 1;
+	if (nCartas == 5) if (sequencia (cartas), flush (cartas)) flag = 1;
 
 	return flag; 
 
