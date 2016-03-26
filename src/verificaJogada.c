@@ -86,6 +86,48 @@ int numCartas (MAO sel){
 	return nCartas;
 }
 
+/////////////////
+void swap(int v[],int i, int j){
+	int temp;
+	v[i] = temp;
+	v[i] = v[j];
+	v[j] = temp;
+}
+
+
+int partition (int v[],int N){
+	int i,p;
+	while (i<N-1){
+		if (v[i]>v[N-1]) i++;
+		else {
+			swap (v,i,p);
+			i++;
+			p++;
+		}
+	}
+	swap (v,p,N-1);
+	return p;
+}
+
+
+
+void quickSort (int v[], int N) {
+	int p;
+	if (N>1){
+		p = partition (v,N);
+		quickSort (v,N);
+		quickSort (&(v[p+1],N-p-1));
+	}
+}
+
+//////////////////
+
+
+
+
+
+
+
 void insert (int v[] , int N , int x){
 
 	int i;
@@ -165,34 +207,22 @@ int flush (char cartas[3][56]){
 	return (i == 4);
 }
 
-int fullhouse (char cartas[3][56]){ /*ISTO TA TUDO FUDIDU*/
+int fullAndfour (char cartas[3][56]){ /*ISTO TA TUDO FUDIDU*/
 
-	int ranks[5], i, r = 1;
-
-	for (i = 0 ; i < 5 ; i++)
-		ranks[i] = returnValue (cartas[i]);
-
-	for (i = 0 ; i < 5 ; i++)
-		if (ranks[0] == ranks[i + 1]) r++;
-
-	for (i = 1 ; i < 5 ; i++)
-		if (ranks[1]== ranks[i + 1] && ranks [i + 1] != ranks [0]) r++;
-
-	return (r == 4);
-}
-
-
-int  fourofakind (char cartas[3][56]){ /*ISTO TA AINDA MAIS FUDIDU*/
-	int ranks[5], i, r = 1;
+	int ranks[4], i, r = 0;
 
 	for (i = 0 ; i < 5 ; i++)
 		ranks[i] = returnValue (cartas[i]);
+	quickSort (ranks,5);
+	if
+		((ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]) 
+			|| (ranks[0]==ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
+			(ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[2] == ranks[3] && ranks[3] == ranks[4])) r=1;
 
-	for (i = 0 ; i < 5 ; i++)
-		if (ranks [0] == ranks [i+1]) r++;
 
-	return (r == 1 || r == 4);
+	return r;
 }
+
 
 /** \brief Verifica se uma determinada jogada é valida
 @param MAO recebe uma mão
@@ -212,7 +242,7 @@ int verificaJogada (MAO mao){
 
 	if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
 
-	if (nCartas == 5) if (sequencia (cartas) || flush (cartas)) flag = 1;
+	if (nCartas == 5) if (sequencia (cartas) || flush (cartas) || fullAndfour (cartas)) flag = 1;
 
 	return flag; 
 
