@@ -165,7 +165,38 @@ int flush (char cartas[3][56]){
 	return (i == 4);
 }
 
-/** Verifica se uma determinada jogada é valida*/ 
+int fullhouse (char cartas[3][56]){ /*ISTO TA TUDO FUDIDU*/
+
+	int ranks[5], i, r = 1;
+
+	for (i = 0 ; i < 5 ; i++)
+		ranks[i] = returnValue (cartas[i]);
+
+	for (i = 0 ; i < 5 ; i++)
+		if (ranks[0] == ranks[i + 1]) r++;
+
+	for (i = 1 ; i < 5 ; i++)
+		if (ranks[1]== ranks[i + 1] && ranks [i + 1] != ranks [0]) r++;
+
+	return (r == 4);
+}
+
+
+int  fourofakind (char cartas[3][56]){ /*ISTO TA AINDA MAIS FUDIDU*/
+	int ranks[5], i, r = 1;
+
+	for (i = 0 ; i < 5 ; i++)
+		ranks[i] = returnValue (cartas[i]);
+
+	for (i = 0 ; i < 5 ; i++)
+		if (ranks [0] == ranks [i+1]) r++;
+
+	return (r == 1 || r == 4);
+}
+
+/** \brief Verifica se uma determinada jogada é valida
+@param MAO recebe uma mão
+*/ 
 
 int verificaJogada (MAO mao){
 
@@ -181,7 +212,7 @@ int verificaJogada (MAO mao){
 
 	if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
 
-	if (nCartas == 5) if (sequencia (cartas), flush (cartas)) flag = 1;
+	if (nCartas == 5) if (sequencia (cartas) || flush (cartas)) flag = 1;
 
 	return flag; 
 
