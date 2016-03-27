@@ -14,6 +14,19 @@ Ordem das cartas
 
 typedef long long int MAO;
 
+struct state{
+  MAO mao[4]; /*Maos de cada jogador*/
+  MAO selecao; /*Cartas selecionadas*/
+  MAO played[4]; /*Cartas jogadas*/
+  int cartas[4]; /*Numero de cartas*/
+  int action, /*valor de jogada do joador proprio*/
+   	  jogador, /*jogadr em mao*/
+   	  nCartas, /*Numero de cartas em jogo*/
+   	  nJogadas; /*Numero de jogadas ocorridas*/
+};
+
+typedef struct state ESTADO;
+
 void valueToStr (char str[], int valor , int naipe){
 
 	char *suit = NAIPES;
@@ -86,69 +99,42 @@ int numCartas (MAO sel){
 	return nCartas;
 }
 
-/////////////////
-void swap(int v[],int i, int j){
+
+void swap(int v[], int i, int j){
+
 	int temp;
-	v[i] = temp;
+
+	temp = v[i];
 	v[i] = v[j];
 	v[j] = temp;
 }
 
 
-int partition (int v[],int N){
-	int i,p;
-	while (i<N-1){
-		if (v[i]>v[N-1]) i++;
-		else {
-			swap (v,i,p);
-			i++;
+int partition (int v[], int N){
+
+	int i = 0, p = 0;
+	while (i < N - 1) {
+		if (v[i] > v[N-1]) i++;
+		else{
+			swap (v , i , p);
 			p++;
+			i++;
 		}
 	}
-	swap (v,p,N-1);
+
+	swap (v , p , N-1);
 	return p;
 }
 
+void QSort (int v[], int N){
 
-
-void quickSort (int v[], int N) {
 	int p;
-	if (N>1){
-		p = partition (v,N);
-		quickSort (v,N);
-		quickSort (&(v[p+1],N-p-1));
+	if (N > 1){
+		p = partition (v , N);
+
+		QSort (v , p);
+		QSort (&v[p+1], N-p-1);
 	}
-}
-
-//////////////////
-
-
-
-
-
-
-
-void insert (int v[] , int N , int x){
-
-	int i;
-
-	for (i = 0 ; x > v[i] && i < N ; i++);
-
-	while (i < N){
-		v[N] = v[N - 1];
-		N--;
-	}
-
-	v[i] = x;
-}
-
-void insertSort (int v[] , int N){
-
-	int i;
-
-	for (i = 0 ; i < N ; i++)
-		insert (v , i , v[i]);
-
 }
 
 /** \brief Recebe dois valores de cartas e verifica se são seguidas
@@ -172,13 +158,13 @@ int sequencia (char cartas[3][56]){
 	for (i = 0 ; i < 5 ; i++)
 		valores[i] = returnValue(cartas[i]);
 
-	insertSort (valores , 5);
+	QSort (valores , 5);
 
 	for (i = 0 ; i + 1 < 5 && verificaSeguidos (valores[i] , valores[i + 1]) ; i++);
 
 	if (i == 4) flag = 1;
 
-	else{
+	else{/*Para o caso da existencia de uma sequencia em que envolva uma carta de valor 0 e uma de 12*/
 		for (n = 0 , i++ ; i < 5 ; n++, i++)
 			tmp[n] = valores[i];
 		for (i = 0, ntmp = 4 , n = 4 - n ; n >= 0 ; n--, i++, ntmp--)
@@ -207,20 +193,51 @@ int flush (char cartas[3][56]){
 	return (i == 4);
 }
 
-int fullAndfour (char cartas[3][56]){ /*ISTO TA TUDO FUDIDU*/
+int fullAndfour (char cartas[3][56]){ 
 
-	int ranks[4], i, r = 0;
+	int ranks[5], i;
 
 	for (i = 0 ; i < 5 ; i++)
 		ranks[i] = returnValue (cartas[i]);
-	quickSort (ranks,5);
-	if
-		((ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]) 
-			|| (ranks[0]==ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
-			(ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[2] == ranks[3] && ranks[3] == ranks[4])) r=1;
 
+	QSort (ranks , 5);
 
-	return r;
+	return 	((ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3]) || (ranks[1]==ranks[2] && ranks[2] == ranks[3] && ranks[4]) ||
+			(ranks[0]==ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
+			(ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
+}
+
+int returnValuelld (MAO mao){
+
+	int naipe, valor;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (mao & (MAO) 1) return valor;
+
+	return (-1); 
+}
+
+int returnNaipelld (MAO mao){
+
+	int naipe, valor;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (mao & (MAO) 1) return naipe;
+
+	return (-1); 
+}
+
+int moreValuable (ESTADO e , char mao[3]){
+
+	int flag = 0;
+
+	if (returnValue(mao) > returnValuelld(e.played[e.jogador - 1])) flag = 1;
+
+	else if (returnValue(mao) == returnValuelld(e.played[e.jogador - 1]) && returnNaipe(mao) > returnNaipelld(e.played[e.jogador - 1])) flag = 1;
+
+	return flag;
 }
 
 
@@ -228,21 +245,29 @@ int fullAndfour (char cartas[3][56]){ /*ISTO TA TUDO FUDIDU*/
 @param MAO recebe uma mão
 */ 
 
-int verificaJogada (MAO mao){
+int verificaJogada (ESTADO e){
 
-	int nCartas, flag = 0;
+	MAO mao = e.selecao;
+
+	int nCartasSelecao, flag = 0;
 
 	char cartas[3][56];
 
-	nCartas = maoRead(cartas , mao);
+	char cartasAnterior[3][56];
 
-	if (nCartas == 1) flag = 1;
+	nCartasSelecao = maoRead(cartas , mao);
 
-	if (nCartas == 2) if (returnValue (cartas[0]) == returnValue (cartas[1])) flag = 1;
+	e.nCartas = maoRead(cartasAnterior , e.played[e.jogador - 1]);
 
-	if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
+	if (carta_existe (e.mao[3] , 0 , 0)) if (e.selecao == (MAO) 1) flag = 1;
 
-	if (nCartas == 5) if (sequencia (cartas) || flush (cartas) || fullAndfour (cartas)) flag = 1;
+	if (e.nCartas == 1) if (nCartasSelecao == 1 && moreValuable (e , cartas[0])) flag = 1;
+
+	if (e.nCartas == 2) if (returnValue (cartas[0]) == returnValue (cartas[1])) flag = 1;
+
+	if (e.nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
+
+	if (e.nCartas == 5) if (sequencia (cartas) || flush (cartas) || fullAndfour (cartas)) flag = 1;
 
 	return flag; 
 
