@@ -32,8 +32,12 @@ struct state{
   MAO selecao; /*Cartas selecionadas*/
   MAO played[4]; /*Cartas jogadas*/
   int cartas[4]; /*Numero de cartas*/
-  int action, jogador, nCartas, nJogadas, passadas; 
+  int action, /*valor de jogada do joador proprio*/
+   	  jogador, /*jogadr em mao*/
+   	  nCartas, /*Numero de cartas em jogo*/
+   	  nJogadas; /*Numero de jogadas ocorridas*/
 };
+
 
 typedef struct state ESTADO;
 
@@ -214,44 +218,122 @@ void imprime_botoes (int x , int y, ESTADO e){
 }
 
 
+int returnValuelld (MAO mao){
+
+	int valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe , valor)) return valor;
+
+	return -1;
+}
+
+int returnNaipelld (MAO mao){
+
+	int valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe , valor)) return naipe;
+
+	return -1;
+}
 
 ESTADO autoplay (ESTADO e){
 
-	MAO tmp = e.mao[e.jogador];
-	int naipe, valor;
+	MAO maoAnterior;
 
-	naipe = valor = 0;
+	int valor, naipe, proceder, flag = 1, count = 0;
 
-	if (e.nJogadas == 0){
+	int minValue, minNaipe;
 
-		while (((~tmp & (MAO) 1)) && naipe < 4){
-			while (((~tmp & (MAO) 1)) && valor < 13){
-				valor++;
-				tmp = tmp >> 1;
-			}
-			naipe++;
-		}
+	e.played[e.jogador] = (MAO) 0;
 
-		if (valor != 0 && naipe != 0) naipe--;
+	if (e.nCartas == 0) for (proceder = 1, naipe = 0 ; naipe < 4 && proceder ; naipe++)
+							for (valor = 0 ; valor < 13 && proceder ; valor++)
+								if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 
-	e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
-	e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor);
+									e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
+									e.mao[e.jogador] = rem_carta (e.mao[e.jogador] , naipe , valor);
+
+									e.nCartas = 1;
+									proceder = 0;
+									flag = 0;
+								}
+
+	if (e.nCartas == 1 && flag){
+		maoAnterior = e.played[previousPlayer(e.jogador)];
+		minValue = returnValuelld (maoAnterior);
+		minNaipe = returnNaipelld (maoAnterior);
+
+		proceder = 1;
+
+		for (naipe = minNaipe, valor = minValue ; naipe < 4 && proceder ; naipe++)
+					if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
+					e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor); 
+					proceder = 0;
+					flag = 0;
+					}
+
+		for (valor = minValue ; valor < 13 && proceder ; valor++)
+			for (naipe = 0 ; naipe < 4 && proceder ; naipe++)
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
+					e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor); 
+					proceder = 0;
+					flag = 0;
+				}
+	}
+
+	if (e.nCartas == 2 && flag){
+
+		maoAnterior = e.played[previousPlayer(e.jogador)];
+		minValue = returnValuelld (maoAnterior);
+		minNaipe = returnNaipelld (maoAnterior);
+
+		for (valor = minValue + 1 ; valor < 13 && count < 2 ; valor++)
+			for (naipe = count = 0 , e.played[e.jogador] = (MAO) 0 ; naipe < 4 && count < 2 ; naipe++)
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+					count++;
+					e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
+				}
+
+		if (count == 2) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+
+		else e.played[e.jogador] = (MAO) 0;
+
+		flag = 0;
+
+	}
+
+	if (e.nCartas == 3 && flag){
+
+		maoAnterior = e.played[previousPlayer(e.jogador)];
+		minValue = returnValuelld (maoAnterior);
+		minNaipe = returnNaipelld (maoAnterior);
+
+		for (valor = minValue + 1 ; valor < 13 && count < 3 ; valor++)
+			for (naipe = count = 0 , e.played[e.jogador] = (MAO) 0 ; naipe < 4 && count < 3 ; naipe++)
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+					count++;
+					e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
+				}
+
+		if (count == 3) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+
+		else e.played[e.jogador] = (MAO) 0;
+
+		flag = 0;
+	}
 
 	e.jogador++;
-	e.nJogadas++;
-	e.nCartas = 1;
-	}
-
-	else{
-
-		if (e.nCartas == 1){
-
-
-		}
-	}
 
 	return e;
+	
 }
+
 
 /** \brief Imprime o estado
 
@@ -268,21 +350,16 @@ void imprime(ESTADO e){
 		e = inicializa (e);
 		e = shuffle (e);
 	}
-
+	
 	if (e.action == 2){ /*JOGAR*/
 		e.played[3] = e.selecao;
 		e.mao[3] = rem_cartas (e.mao[3] , e.selecao);
+		e.nCartas = numCartas (e.selecao);
 		e.selecao = 0;
 		e.jogador = 0;
 	}
 
-	while (e.jogador != 3){
-
-		e = autoplay(e);
-	}
-
-	
-
+	while (e.jogador != 3) e = autoplay (e);
 
 	imprime_mao (150 , 010 , e , e.mao[0] , 0);
 	imprime_mao (350 , 010 , e , e.mao[1] , 1);
@@ -301,6 +378,8 @@ void imprime(ESTADO e){
 
 	printf("</svg>\n");
 }
+
+
 
 /**	\brief Distribui aleatoriamente as 56 cartas pelos 4 jogadores e determina qual começa a jogar.
 @param ESTADO Estado do jogo atual.
@@ -341,7 +420,7 @@ ESTADO shuffle (ESTADO e){
 /** \brief Escreve o estado através da script.
 @param SCRIPT script
 */
-ESTADO str2estado (char* str) {
+ESTADO str2estado (char* str){
 	ESTADO e;
 	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.nJogadas);
 	return e;
@@ -356,6 +435,7 @@ char* estado2str (ESTADO e){
 	return res;
 }
 
+
 /** \brief Inicializa o estado, alterando todos os valores para 0.
 @param ESTADO estado
 */
@@ -367,9 +447,12 @@ ESTADO inicializa (ESTADO e){
     	e.cartas[i]=0;
     	e.played[i]=0;
     }
+
     e.action = 0;
     e.nCartas = 0;
     e.nJogadas = 0;
+    e.selecao = 0;
+
     return e;
 }
 
@@ -380,7 +463,7 @@ Neste momento, a query contém o estado que é um inteiro que representa um conj
 Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
 Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
 @param query A query que é passada à cgi-bin
- */
+*/
 void parse(char *query , ESTADO e){
 
 	if (strlen (query) == 0)

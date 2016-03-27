@@ -35,6 +35,8 @@ void valueToStr (char str[], int valor , int naipe){
 	sprintf (str , "%c_%c" , rank[valor] , suit[naipe]);
 }
 
+
+
 /**
 Devolver o valor de 0 a 12 de uma carta
 */
@@ -98,7 +100,6 @@ int numCartas (MAO sel){
 
 	return nCartas;
 }
-
 
 void swap(int v[], int i, int j){
 
@@ -164,7 +165,7 @@ int sequencia (char cartas[3][56]){
 
 	if (i == 4) flag = 1;
 
-	else{/*Para o caso da existencia de uma sequencia em que envolva uma carta de valor 0 e uma de 12*/
+	else{
 		for (n = 0 , i++ ; i < 5 ; n++, i++)
 			tmp[n] = valores[i];
 		for (i = 0, ntmp = 4 , n = 4 - n ; n >= 0 ; n--, i++, ntmp--)
@@ -202,75 +203,93 @@ int fullAndfour (char cartas[3][56]){
 
 	QSort (ranks , 5);
 
-	return 	((ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3]) || (ranks[1]==ranks[2] && ranks[2] == ranks[3] && ranks[4]) ||
-			(ranks[0]==ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
-			(ranks[0]==ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
+	return 	((ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks [2] == ranks[3]) || (ranks[1] == ranks[2] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) ||
+			(ranks[0] == ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
+			(ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
 }
 
-int returnValuelld (MAO mao){
+int previousPlayer (int n){
 
-	int naipe, valor;
+	int x; 
+	if (n == 0) x = 4;
 
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
-			if (mao & (MAO) 1) return valor;
+	else x = n - 1;
 
-	return (-1); 
+	return x;
 }
 
-int returnNaipelld (MAO mao){
+/** \brief verifica se uma carta é maior que outra
+@param MAIOR carta maior
+@param MENOR carta menor
+*/
+int cartaMaior (char carta1[3] , char carta2[3]){
 
-	int naipe, valor;
+	int flag = 0, value1, value2, naipe1, naipe2;
 
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
-			if (mao & (MAO) 1) return naipe;
+	value1 = returnValue (carta1);
+	value2 = returnValue (carta2);
+	naipe1 = returnNaipe (carta1);
+	naipe2 = returnNaipe (carta2);
 
-	return (-1); 
+	if (value1 > value2) flag = 1;
+
+	else if (value1 == value2 && naipe1 > naipe2) flag = 1;
+
+	return flag; 
 }
-
-int moreValuable (ESTADO e , char mao[3]){
-
-	int flag = 0;
-
-	if (returnValue(mao) > returnValuelld(e.played[e.jogador - 1])) flag = 1;
-
-	else if (returnValue(mao) == returnValuelld(e.played[e.jogador - 1]) && returnNaipe(mao) > returnNaipelld(e.played[e.jogador - 1])) flag = 1;
-
-	return flag;
-}
-
 
 /** \brief Verifica se uma determinada jogada é valida
-@param MAO recebe uma mão
+@param ESTADO recebe o estado atual
 */ 
 
 int verificaJogada (ESTADO e){
 
-	MAO mao = e.selecao;
+	int nCartas, flag = 0 , prosseguir = 1;
 
-	int nCartasSelecao, flag = 0;
+	char cartas[3][56], cartasAnteriores[3][56];
 
-	char cartas[3][56];
+	nCartas = maoRead(cartas , e.selecao);
 
-	char cartasAnterior[3][56];
+	maoRead(cartasAnteriores , e.played[previousPlayer (3)]);
 
-	nCartasSelecao = maoRead(cartas , mao);
+	if (e.nCartas == 0){
 
-	e.nCartas = maoRead(cartasAnterior , e.played[e.jogador - 1]);
+		if (nCartas == 1){
+			if (carta_existe (e.mao[3] , 0 , 0)){
+				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 1;
+			}
+			else flag = 1;
+		}
 
-	if (carta_existe (e.mao[3] , 0 , 0)) if (e.selecao == (MAO) 1) flag = 1;
+		if (nCartas == 2) if (returnValue (cartas[0]) == returnValue (cartas[1])){
+			if (carta_existe (e.mao[3] , 0 , 0)){
+				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 2;
+			}
+			else flag = 1;
+		}
 
-	if (e.nCartas == 1) if (nCartasSelecao == 1 && moreValuable (e , cartas[0])) flag = 1;
+		if (nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])){
+			if (carta_existe (e.mao[3] , 0 , 0)){
+				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 3;
+			}
+			else flag = 1;
+		}
 
-	if (e.nCartas == 2) if (returnValue (cartas[0]) == returnValue (cartas[1])) flag = 1;
+		if (nCartas == 5) if (sequencia (cartas) || flush (cartas) || fullAndfour (cartas)){
+			if (carta_existe (e.mao[3] , 0 , 0)){
+				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 5;
+			}
+			else flag = 1;
+		}
+		prosseguir = 0;
+	}
 
-	if (e.nCartas == 3) if (returnValue (cartas[0]) == returnValue (cartas[1]) && returnValue (cartas[1]) == returnValue (cartas[2])) flag = 1;
+	if (e.nCartas == 1 && prosseguir){
 
-	if (e.nCartas == 5) if (sequencia (cartas) || flush (cartas) || fullAndfour (cartas)) flag = 1;
+		if (nCartas == 1 && cartaMaior(cartas[0] , cartasAnteriores[0])) flag = 1;
 
+	}
 	return flag; 
-
 }
 
 /*
@@ -317,7 +336,7 @@ int main (){
 		scanf ("%d" , &array[i]);
 	}
 
-	insertSort (array , N);
+	QSort (array , N);
 
 	for (i = 0 ; i < N ; i++)
 		printf("%d\n" , array[i]);
