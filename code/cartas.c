@@ -203,13 +203,15 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
 
-	y += 70;
+	y += 100;
 
 	e.action = 3;
+		if (e.nCartas != 0){
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
-	
-	y += 70;
+		}
+		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "pass.png");
+	y += 100;
 
 	e.action = 1;
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
@@ -360,6 +362,12 @@ void imprime(ESTADO e){
 		e.nCartas = numCartas (e.selecao);
 		e.selecao = 0;
 		e.jogador = 0;
+		e.passar = 0;
+	}
+
+	if (e.action == 3){/*PASSAR*/
+	e.passar++;
+	e.jogador = 0;
 	}
 
 	e.action = 0;
@@ -381,12 +389,10 @@ void imprime(ESTADO e){
 	imprime_mao (300 , 530 , e , e.played[3] , 7);
 
 
-	imprime_botoes (700 , 550 , e);
+	imprime_botoes (700 , 450 , e);
 
 	printf("</svg>\n");
 }
-
-
 
 /**	\brief Distribui aleatoriamente as 56 cartas pelos 4 jogadores e determina qual começa a jogar.
 @param ESTADO Estado do jogo atual.
@@ -459,6 +465,7 @@ ESTADO inicializa (ESTADO e){
     e.nCartas = 0;
     e.nJogadas = 0;
     e.selecao = 0;
+    e.passar = 0;
 
     return e;
 }
