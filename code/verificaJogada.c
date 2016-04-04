@@ -211,7 +211,7 @@ int fullAndfour (char cartas[3][56]){
 int previousPlayer (int n){
 
 	int x; 
-	if (n == 0) x = 4;
+	if (n == 0) x = 3;
 
 	else x = n - 1;
 
@@ -252,7 +252,7 @@ int verificaJogada (ESTADO e){
 
 	maoRead(cartasAnteriores , e.played[previousPlayer (3)]);
 
-	if (e.nCartas == 0){
+	if (e.nCartas == 0){ /*Abrir jogada*/
 
 		if (nCartas == 1){
 			if (carta_existe (e.mao[3] , 0 , 0)){

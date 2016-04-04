@@ -34,8 +34,9 @@ struct state{
   int cartas[4]; /*Numero de cartas*/
   int action, /*valor de jogada do joador proprio*/
    	  jogador, /*jogadr em mao*/
-   	  nCartas, /*Numero de cartas em jogo*/
-   	  nJogadas; /*Numero de jogadas ocorridas*/
+   	  nCartas, /*Numero de cartas em jogo por mão*/
+   	  nJogadas, /*Numero de jogadas ocorridas*/
+	  passar; /*Número de vezes consecutivas que o*/
 };
 
 
@@ -213,8 +214,6 @@ void imprime_botoes (int x , int y, ESTADO e){
 	e.action = 1;
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
-	
-	e.action = 0;
 }
 
 
@@ -277,7 +276,7 @@ ESTADO autoplay (ESTADO e){
 					flag = 0;
 					}
 
-		for (valor = minValue ; valor < 13 && proceder ; valor++)
+		for (valor = ++minValue ; valor < 13 && proceder ; valor++)
 			for (naipe = 0 ; naipe < 4 && proceder ; naipe++)
 				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
@@ -359,7 +358,11 @@ void imprime(ESTADO e){
 		e.jogador = 0;
 	}
 
+	e.action = 0;
+
 	while (e.jogador != 3) e = autoplay (e);
+
+	e.played[3] = (MAO) 0;
 
 	imprime_mao (150 , 010 , e , e.mao[0] , 0);
 	imprime_mao (350 , 010 , e , e.mao[1] , 1);
@@ -479,10 +482,10 @@ void parse(char *query , ESTADO e){
 Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
 a função que vai imprimir o código html para desenhar as cartas
  */
-int main() {
+int main(){	
 
 	ESTADO est;
-	
+
 	/** Cabeçalhos necessários numa CGI
  */
 	printf("Content-Type: text/html; charset=utf-8\n\n");
