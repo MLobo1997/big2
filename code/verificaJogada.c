@@ -214,7 +214,7 @@ int previousPlayer (ESTADO *e){
 
 	int n = e->jogador; 
 
-	if (n == 3) n = 0;
+	if (n == 0) n = 3;
 
 	else n--;
 
