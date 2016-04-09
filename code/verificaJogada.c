@@ -25,7 +25,6 @@ struct state{
 	  passar; /*Número de vezes consecutivas que o*/
 };
 
-
 typedef struct state ESTADO;
 
 int carta_existe(long long int est, int naipe, int valor);
@@ -211,13 +210,15 @@ int fullAndfour (char cartas[3][56]){
 			(ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
 }
 
-int previousPlayer (ESTADO * e){
+int previousPlayer (ESTADO *e){
 
-	int n = e->jogador;
+	int n = e->jogador; 
 
-	n -= e->passar + 1;
+	if (n == 3) n = 0;
 
-	if (n < 0) n += 4; 
+	else n--;
+
+	n -= e->passar;
 
 	return n;
 }

@@ -51,7 +51,7 @@ ESTADO inicializa (ESTADO e);
 
 int verificaJogada (ESTADO e);
 
-int previousPlayer (int n);
+int previousPlayer (ESTADO * e);
 
 int numCartas (MAO sel);
 
@@ -118,7 +118,7 @@ MAO rem_cartas(MAO est , MAO rem){
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		1 se a carta existe e 0 caso contrário
 */
-int carta_existe(long long int est, int naipe, int valor) {
+int carta_existe(long long int est, int naipe, int valor){
 	int idx = indice(naipe, valor);
 	return (est >> idx) & 1;
 }
@@ -280,7 +280,7 @@ ESTADO autoplay (ESTADO e){
 								}
 
 	if (e.nCartas == 1 && flag){
-		maoAnterior = e.played[previousPlayer(e.jogador)];
+		maoAnterior = e.played[previousPlayer(&e)];
 		minValue = returnValuelld (maoAnterior);
 		minNaipe = returnNaipelld (maoAnterior);
 
@@ -306,7 +306,7 @@ ESTADO autoplay (ESTADO e){
 
 	if (e.nCartas == 2 && flag){
 
-		maoAnterior = e.played[previousPlayer(e.jogador)];
+		maoAnterior = e.played[previousPlayer(&e)];
 		minValue = returnValuelld (maoAnterior);
 		minNaipe = returnNaipelld (maoAnterior);
 
@@ -327,7 +327,7 @@ ESTADO autoplay (ESTADO e){
 
 	if (e.nCartas == 3 && flag){
 
-		maoAnterior = e.played[previousPlayer(e.jogador)];
+		maoAnterior = e.played[previousPlayer(&e)];
 		minValue = returnValuelld (maoAnterior);
 		minNaipe = returnNaipelld (maoAnterior);
 
