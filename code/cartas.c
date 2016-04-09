@@ -235,7 +235,7 @@ int returnValuelld (MAO mao){
 	return -1;
 }
 
-int returnNaipelld (MAO mao){
+int returnNaipelld (MAO mao){/**/
 
 	int valor, naipe;
 
