@@ -21,11 +21,14 @@ struct state{
   int cartas[4]; /*Numero de cartas*/
   int action, /*valor de jogada do joador proprio*/
    	  jogador, /*jogadr em mao*/
-   	  nCartas, /*Numero de cartas em jogo*/
-   	  nJogadas; /*Numero de jogadas ocorridas*/
+   	  nCartas, /*Numero de cartas em jogo por mão*/
+	  passar; /*Número de vezes consecutivas que o*/
 };
 
+
 typedef struct state ESTADO;
+
+int carta_existe(long long int est, int naipe, int valor);
 
 void valueToStr (char str[], int valor , int naipe){
 
@@ -208,14 +211,15 @@ int fullAndfour (char cartas[3][56]){
 			(ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
 }
 
-int previousPlayer (int n){
+int previousPlayer (ESTADO * e){
 
-	int x; 
-	if (n == 0) x = 3;
+	int n = e->jogador;
 
-	else x = n - 1;
+	n -= e->passar + 1;
 
-	return x;
+	if (n < 0) n += 4; 
+
+	return n;
 }
 
 /** \brief verifica se uma carta é maior que outra
@@ -250,7 +254,7 @@ int verificaJogada (ESTADO e){
 
 	nCartas = maoRead(cartas , e.selecao);
 
-	maoRead(cartasAnteriores , e.played[previousPlayer (3)]);
+	maoRead(cartasAnteriores , e.played[previousPlayer (&e)]);
 
 	if (e.nCartas == 0){ /*Abrir jogada*/
 

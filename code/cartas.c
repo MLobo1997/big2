@@ -23,7 +23,7 @@ Ordem das cartas
 
 #define TAM_MAX_ESTADO      1024
 
-#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d_%d"
+#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d"
 
 typedef long long int MAO;
 
@@ -35,7 +35,6 @@ struct state{
   int action, /*valor de jogada do joador proprio*/
    	  jogador, /*jogadr em mao*/
    	  nCartas, /*Numero de cartas em jogo por mão*/
-   	  nJogadas, /*Numero de jogadas ocorridas*/
 	  passar; /*Número de vezes consecutivas que o*/
 };
 
@@ -49,6 +48,12 @@ char* estado2str (ESTADO e);
 ESTADO str2estado (char* str);
 
 ESTADO inicializa (ESTADO e);
+
+int verificaJogada (ESTADO e);
+
+int previousPlayer (int n);
+
+int numCartas (MAO sel);
 
 /**
 	Estado inicial com todas as 52 cartas do baralho
@@ -251,6 +256,17 @@ ESTADO autoplay (ESTADO e){
 
 	e.played[e.jogador] = (MAO) 0;
 
+	if (e.passar == 3){
+		
+		e.passar = 0;
+		e.nCartas = 0;
+
+		e.played[0] = (MAO) 0;
+		e.played[1] = (MAO) 0;
+		e.played[2] = (MAO) 0;
+		e.played[3] = (MAO) 0;
+	}
+
 	if (e.nCartas == 0) for (proceder = 1, naipe = 0 ; naipe < 4 && proceder ; naipe++)
 							for (valor = 0 ; valor < 13 && proceder ; valor++)
 								if (carta_existe (e.mao[e.jogador] , naipe , valor)){
@@ -435,7 +451,7 @@ ESTADO shuffle (ESTADO e){
 */
 ESTADO str2estado (char* str){
 	ESTADO e;
-	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.nJogadas , &e.passar);
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.passar);
 	return e;
 }
 
@@ -444,7 +460,7 @@ ESTADO str2estado (char* str){
 */
 char* estado2str (ESTADO e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.nJogadas , e.passar);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.passar);
 	return res;
 }
 
@@ -463,7 +479,6 @@ ESTADO inicializa (ESTADO e){
 
     e.action = 0;
     e.nCartas = 0;
-    e.nJogadas = 0;
     e.selecao = 0;
     e.passar = 0;
 
