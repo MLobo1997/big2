@@ -367,6 +367,7 @@ void imprime(ESTADO e){
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
+
 	if (e.action == 1){ /*BARALHAR*/
 		e = inicializa (e);
 		e = shuffle (e);
@@ -389,6 +390,17 @@ void imprime(ESTADO e){
 	e.action = 0;
 
 	while (e.jogador != 3) e = autoplay (e);
+
+	if (e.passar == 3){
+		
+		e.passar = 0;
+		e.nCartas = 0;
+
+		e.played[0] = (MAO) 0;
+		e.played[1] = (MAO) 0;
+		e.played[2] = (MAO) 0;
+		e.played[3] = (MAO) 0;
+	}
 
 	e.played[3] = (MAO) 0;
 
