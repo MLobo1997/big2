@@ -220,6 +220,8 @@ int previousPlayer (ESTADO *e){
 
 	n -= e->passar;
 
+	if (n < 0) n += 4;
+
 	return n;
 }
 
