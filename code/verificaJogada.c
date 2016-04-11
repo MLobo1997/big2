@@ -249,7 +249,7 @@ int cartaMaior (char carta1[3] , char carta2[3]){
 @param ESTADO recebe o estado atual
 */ 
 
-int verificaJogada (ESTADO e){
+int verificaJogada (ESTADO e){ //* só ta configurado para a abertura
 
 	int nCartas, flag = 0 , prosseguir = 1;
 
@@ -263,7 +263,7 @@ int verificaJogada (ESTADO e){
 
 		if (nCartas == 1){
 			if (carta_existe (e.mao[3] , 0 , 0)){
-				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 1;
+				if (carta_existe (e.selecao , 0 , 0)) flag = 1, e.nCartas = 1; 
 			}
 			else flag = 1;
 		}
