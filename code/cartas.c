@@ -267,17 +267,19 @@ ESTADO autoplay (ESTADO e){
 		e.played[3] = (MAO) 0;
 	}
 
-	if (e.nCartas == 0) for (proceder = 1, naipe = 0 ; naipe < 4 && proceder ; naipe++)
-							for (valor = 0 ; valor < 13 && proceder ; valor++)
-								if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+	if (e.nCartas == 0){ 	for (proceder = 1, valor = 0 ; valor < 13 && proceder ; valor++)
+								for (naipe = 0 ; naipe < 4 && proceder ; naipe++)
+									if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 
-									e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
-									e.mao[e.jogador] = rem_carta (e.mao[e.jogador] , naipe , valor);
+										e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
+										e.mao[e.jogador] = rem_carta (e.mao[e.jogador] , naipe , valor);
 
-									e.nCartas = 1;
-									proceder = 0;
-									flag = 0;
-								}
+										e.nCartas = 1;
+										proceder = 0;
+									}
+									
+							flag = 0;				
+	}
 
 	if (e.nCartas == 1 && flag){
 		maoAnterior = e.played[previousPlayer(&e)];
