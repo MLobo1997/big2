@@ -68,9 +68,10 @@ int returnNaipe (char carta[3]){
 
 }
 
-/** \brief Coloca numa matriz strings com o formato "(valor)_(naipe)" e devolve o número de strings colocadas
-@param MATRIZ poderá ter até 56 cartas (strings de 3 elementos)
+/** \brief Coloca num array strings com o formato "(valor)_(naipe)" e devolve o número de strings colocadas
+@param MATRIZ poderá ter até 56 cartas (strings de 3 elementos).
 @param MAO O long long int que será lido.
+@return NUM número de cartas.
 */
 
 int maoRead (char cards[3][56] , MAO mao){
@@ -245,11 +246,34 @@ int cartaMaior (char carta1[3] , char carta2[3]){
 	return flag; 
 }
 
+int verificaDuas (char cartas[3][56] , char cartasAnteriores[3][56]){ /*Why u no work*/
+
+	char maior[3], maiorAnterior[3];
+
+	int flag = 0;
+
+	if (cartas[0][0] == cartas [0][1]){
+
+		if (cartaMaior (cartas[0] , cartas[1])) strcpy (maior , cartas[0]);
+
+		else strcpy (maior , cartas[1]);
+
+		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (maiorAnterior , cartasAnteriores[0]);
+
+		else strcpy (maiorAnterior , cartasAnteriores[1]);
+
+		if (cartaMaior (maior , maiorAnterior)) flag = 1;
+
+	}
+
+	return flag;
+}
+
 /** \brief Verifica se uma determinada jogada é valida
 @param ESTADO recebe o estado atual
 */ 
 
-int verificaJogada (ESTADO e){ //* só ta configurado para a abertura
+int verificaJogada (ESTADO e){
 
 	int nCartas, flag = 0 , prosseguir = 1;
 
@@ -296,6 +320,13 @@ int verificaJogada (ESTADO e){ //* só ta configurado para a abertura
 		if (nCartas == 1 && cartaMaior(cartas[0] , cartasAnteriores[0])) flag = 1;
 
 	}
+
+	if (e.nCartas == 2 && prosseguir){
+
+		if (nCartas == 2 && verificaDuas (cartas , cartasAnteriores)) flag = 1;
+
+	}
+
 	return flag; 
 }
 
