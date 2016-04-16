@@ -43,7 +43,7 @@ void valueToStr (char str[], int valor , int naipe){
 Devolver o valor de 0 a 12 de uma carta
 */
 
-int returnValue (char carta[3]){
+int returnValue (char carta[4]){
 
 	int i;
 	char *rank = VALORES;
@@ -57,7 +57,7 @@ int returnValue (char carta[3]){
 Devolver o naipe de 0 a 3 de uma carta
 */
 
-int returnNaipe (char carta[3]){
+int returnNaipe (char carta[4]){
 
 	int i;
 	char *suit = NAIPES;
@@ -74,11 +74,11 @@ int returnNaipe (char carta[3]){
 @return NUM número de cartas.
 */
 
-int maoRead (char cards[3][56] , MAO mao){
+int maoRead (char cards[4][56] , MAO mao){
 
 	int valor, naipe, n;
 
-	char tmp[3];
+	char tmp[4];
 
 	for (naipe = n = 0 ; naipe <= 3 ; naipe++)
 		for (valor = 0 ; valor <= 12 ; valor++){
@@ -154,7 +154,7 @@ int verificaSeguidos (int n1 , int n2){
 	return flag;
 }
 
-int sequencia (char cartas[3][56]){
+int sequencia (char cartas[4][56]){
 
 	int valores[5], tmp[5];
 	int i, n, ntmp, flag = 0;
@@ -185,7 +185,7 @@ int sequencia (char cartas[3][56]){
 	return flag;
 }
 
-int flush (char cartas[3][56]){
+int flush (char cartas[4][56]){
 
 	int naipes[5], i;
 
@@ -197,7 +197,7 @@ int flush (char cartas[3][56]){
 	return (i == 4);
 }
 
-int fullAndfour (char cartas[3][56]){ 
+int fullAndfour (char cartas[4][56]){ 
 
 	int ranks[5], i;
 
@@ -230,7 +230,7 @@ int previousPlayer (ESTADO *e){
 @param MAIOR carta maior
 @param MENOR carta menor
 */
-int cartaMaior (char carta1[3] , char carta2[3]){
+int cartaMaior (char carta1[4] , char carta2[4]){
 
 	int flag = 0, value1, value2, naipe1, naipe2;
 
@@ -246,13 +246,13 @@ int cartaMaior (char carta1[3] , char carta2[3]){
 	return flag; 
 }
 
-int verificaDuas (char cartas[3][56] , char cartasAnteriores[3][56]){ /*Why u no work*/
+int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no work*/
 
-	char maior[3], maiorAnterior[3];
+	char maior[4], maiorAnterior[4];
 
 	int flag = 0;
 
-	if (cartas[0][0] == cartas [0][1]){
+	if (returnValue(cartas[0]) == returnValue(cartas[1])){
 
 		if (cartaMaior (cartas[0] , cartas[1])) strcpy (maior , cartas[0]);
 
@@ -269,6 +269,34 @@ int verificaDuas (char cartas[3][56] , char cartasAnteriores[3][56]){ /*Why u no
 	return flag;
 }
 
+int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no work*/
+
+	char maior[4], maiorAnterior[4];
+
+	int flag = 0;
+
+	if (returnValue(cartas[0]) == returnValue(cartas[1]) && returnValue(cartas[1]) == returnValue(cartas[2])){
+
+		if (cartaMaior (cartas[0] , cartas[1])) strcpy (maior , cartas[0]);
+		
+		else strcpy (maior , cartas[1]);
+
+		if (!cartaMaior (maior , cartas[2])) strcpy (maior , cartas[2]);
+
+		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (maiorAnterior , cartasAnteriores[0]);
+
+		else strcpy (maiorAnterior , cartasAnteriores[1]);
+
+		if (!cartaMaior (maiorAnterior , cartasAnteriores[2])) strcpy (maiorAnterior , cartasAnteriores[2]);
+
+		if (cartaMaior (maior , maiorAnterior)) flag = 1;
+
+	}
+
+	return flag;
+}
+
+
 /** \brief Verifica se uma determinada jogada é valida
 @param ESTADO recebe o estado atual
 */ 
@@ -277,7 +305,7 @@ int verificaJogada (ESTADO e){
 
 	int nCartas, flag = 0 , prosseguir = 1;
 
-	char cartas[3][56], cartasAnteriores[3][56];
+	char cartas[4][56], cartasAnteriores[4][56];
 
 	nCartas = maoRead(cartas , e.selecao);
 
@@ -315,17 +343,20 @@ int verificaJogada (ESTADO e){
 		prosseguir = 0;
 	}
 
-	if (e.nCartas == 1 && prosseguir){
+	if (e.nCartas == 1 && prosseguir)
 
 		if (nCartas == 1 && cartaMaior(cartas[0] , cartasAnteriores[0])) flag = 1;
 
-	}
 
-	if (e.nCartas == 2 && prosseguir){
+	if (e.nCartas == 2 && prosseguir)
 
-		if (nCartas == 2 && verificaDuas (cartas , cartasAnteriores)) flag = 1;
+		if (nCartas == 2 && verificaDuas(cartas , cartasAnteriores)) flag = 1;
 
-	}
+
+	if (e.nCartas == 3 && prosseguir)
+
+		if (nCartas == 3 && verificaTres(cartas , cartasAnteriores)) flag = 1;
+
 
 	return flag; 
 }
