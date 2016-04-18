@@ -181,7 +181,8 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 	if (m <= 2) for (v = 0 ; v < 13 ; v++) /*Para as mãos dos adversários*/
 					for (n = 0 ; n < 4 ; n++){
 						if(carta_existe(mao , n , v)){
-							y += 20;
+							y += 14;
+							x -= 5;
 							imprime_carta (x , y , e , m , n , v);
 						}
 
@@ -278,9 +279,9 @@ void imprime(ESTADO e){
 
 	e.played[3] = (MAO) 0;
 
-	imprime_mao (150 , 010 , e , e.mao[0] , 0);
-	imprime_mao (350 , 010 , e , e.mao[1] , 1);
-	imprime_mao (550 , 010 , e , e.mao[2] , 2);
+	imprime_mao (190 , 010 , e , e.mao[0] , 0);
+	imprime_mao (390 , 010 , e , e.mao[1] , 1);
+	imprime_mao (590 , 010 , e , e.mao[2] , 2);
 	imprime_mao (070 , 650 , e , e.mao[3] , 3);
 
 	/*Imprime as cartas que estão em jogo*/
