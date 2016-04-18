@@ -228,7 +228,15 @@ void imprime_botoes (int x , int y, ESTADO e){
 }
 
 
+void imprime_passar (int n){
 
+	if (n == 0)	printf("<text x=\"100\" y=\"400\" fill=\"black\">Passou!</text>");
+
+	if (n == 1)	printf("<text x=\"300\" y=\"400\" fill=\"black\">Passou!</text>");
+
+	if (n == 2)	printf("<text x=\"500\" y=\"400\" fill=\"black\">Passou!</text>");
+
+}
 
 
 /** \brief Imprime o estado

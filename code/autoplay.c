@@ -50,7 +50,7 @@ int previousPlayer (ESTADO *e);
 
 MAO rem_cartas(MAO est , MAO rem);
 
-
+void imprime_passar (int n);
 
 int returnValuelld (MAO mao){
 
@@ -174,7 +174,7 @@ ESTADO autoplay (ESTADO e){
 		else e.played[e.jogador] = (MAO) 0;
 	}
 
-	if (flag) e.passar++;
+	if (flag) e.passar++, imprime_passar(e.jogador);
 
 	else e.passar = 0;
 

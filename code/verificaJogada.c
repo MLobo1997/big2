@@ -60,6 +60,7 @@ Devolver o naipe de 0 a 3 de uma carta
 int returnNaipe (char carta[4]){
 
 	int i;
+	
 	char *suit = NAIPES;
 
 	for (i = 0; carta[2] != suit[i] ; i++);
@@ -206,7 +207,8 @@ int fullAndfour (char cartas[4][56]){
 
 	QSort (ranks , 5);
 
-	return 	((ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks [2] == ranks[3]) || (ranks[1] == ranks[2] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) ||
+	return 	((ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks [2] == ranks[3]) ||
+			(ranks[1] == ranks[2] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) ||
 			(ranks[0] == ranks[1] && ranks[2] == ranks[3] && ranks[3] == ranks[4]) || 
 			(ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
 }
