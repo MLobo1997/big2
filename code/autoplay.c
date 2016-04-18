@@ -149,11 +149,10 @@ ESTADO autoplay (ESTADO e){
 					e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
 				}
 
-		if (count == 2) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+		if (count == 2) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]), flag = 0;
 
 		else e.played[e.jogador] = (MAO) 0;
 
-		flag = 0;
 
 	}
 
@@ -170,11 +169,9 @@ ESTADO autoplay (ESTADO e){
 					e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
 				}
 
-		if (count == 3) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+		if (count == 3) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]), flag = 0;
 
 		else e.played[e.jogador] = (MAO) 0;
-
-		flag = 0;
 	}
 
 	if (flag) e.passar++;
