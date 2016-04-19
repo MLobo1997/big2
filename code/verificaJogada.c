@@ -297,7 +297,13 @@ int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no
 
 	return flag;
 }
+/*
+int verificaCinco (char cartas [4][56] , char cartasAnteriores [4][56]){
 
+	return 0;
+
+}
+*/
 
 /** \brief Verifica se uma determinada jogada é valida
 @param ESTADO recebe o estado atual
@@ -347,18 +353,22 @@ int verificaJogada (ESTADO e){
 
 	if (e.nCartas == 1 && prosseguir)
 
-		if (nCartas == 1 && cartaMaior(cartas[0] , cartasAnteriores[0])) flag = 1;
+		if (nCartas == 1 && cartaMaior (cartas[0] , cartasAnteriores[0])) flag = 1;
 
 
 	if (e.nCartas == 2 && prosseguir)
 
-		if (nCartas == 2 && verificaDuas(cartas , cartasAnteriores)) flag = 1;
+		if (nCartas == 2 && verificaDuas (cartas , cartasAnteriores)) flag = 1;
 
 
 	if (e.nCartas == 3 && prosseguir)
 
-		if (nCartas == 3 && verificaTres(cartas , cartasAnteriores)) flag = 1;
+		if (nCartas == 3 && verificaTres (cartas , cartasAnteriores)) flag = 1;
 
+/*	if (e.nCartas == 5 && prosseguir)
+
+		if (nCartas == 5 && verificaCinco (cartas ,  cartasAnteriores)) flag = 1;
+*/
 
 	return flag; 
 }

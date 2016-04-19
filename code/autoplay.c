@@ -52,6 +52,8 @@ MAO rem_cartas(MAO est , MAO rem);
 
 void imprime_passar (int n);
 
+int maoRead (char cards[4][56] , MAO mao);
+
 int returnValuelld (MAO mao){
 
 	int valor, naipe;
@@ -75,6 +77,67 @@ int returnNaipelld (MAO mao){/**/
 	return -1;
 }
 
+int valorAnterior (int * valor){
+
+	if (*valor == 0) *valor = 12;
+
+	else (*valor)--;
+
+	return *valor;
+}
+
+int naipeAnterior (int * naipe){
+
+	if (*naipe == 0) *naipe = 3;
+
+	else (*naipe)--;
+
+	return *naipe;
+}
+
+int hasStraightFlush (MAO mao, int naipe, int valor){
+
+	return (carta_existe (mao , naipe , valor) &&
+			carta_existe (mao , naipe , valorAnterior(&valor)) &&
+			carta_existe (mao , naipe , valorAnterior(&valor)) &&
+			carta_existe (mao , naipe , valorAnterior(&valor)) &&
+			carta_existe (mao , naipe , valorAnterior(&valor)));
+}
+
+MAO add_StraightFlush (MAO mao, int naipe, int valor){
+
+	add_carta (mao , naipe , valor);
+	add_carta (mao , naipe , valorAnterior(&valor));
+	add_carta (mao , naipe , valorAnterior(&valor));
+	add_carta (mao , naipe , valorAnterior(&valor));
+	add_carta (mao , naipe , valorAnterior(&valor));
+
+	return mao;
+}
+
+ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
+
+
+	while (naipe < 4 && e.selecao == (MAO) 0){
+		if (hasStraightFlush (e.mao[e.jogador] , naipe , valor)){
+
+			add_StraightFlush (e. selecao , naipe , valor);
+			rem_cartas (e.mao[e.jogador] , e.selecao);
+		}
+		naipe++;
+	}
+
+	for (valor++ ; valor < 13 && e.selecao == (MAO) 0 ; valor++)
+		for (naipe = 0 ; naipe < 4 && e.selecao == (MAO) 0 ; naipe++)
+			if (hasStraightFlush (e.mao[e.jogador] , naipe , valor)){
+
+			add_StraightFlush (e. selecao , naipe , valor);
+			rem_cartas (e.mao[e.jogador] , e.selecao);
+			}
+	
+	return e;
+
+}
 
 ESTADO autoplay (ESTADO e){
 
@@ -172,6 +235,28 @@ ESTADO autoplay (ESTADO e){
 		if (count == 3) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]), flag = 0;
 
 		else e.played[e.jogador] = (MAO) 0;
+	}
+
+	if (e.nCartas == 5 && flag){
+
+		MAO	maoAnterior = e.played[previousPlayer(&e)];
+
+		valor = 12;
+		naipe = 3;
+
+		while (!carta_existe(maoAnterior , naipe , valor)){
+			
+			while (naipe >= 0 && !carta_existe (maoAnterior , naipe , valor)) naipe--;
+
+			if (!carta_existe (maoAnterior , naipe , valor)) valor--;
+		}
+
+		if (!hasStraightFlush(maoAnterior , naipe , valor)) valor = naipe = 0; /*Para o caso de a jogada anterior nao ter sido um straight flush*/
+
+		e = jogaStraightFlush(e , naipe , valor);
+
+		if (e.selecao != (MAO) 0) flag = 0; 
+
 	}
 
 	if (flag) e.passar++, imprime_passar(e.jogador);

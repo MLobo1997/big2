@@ -230,11 +230,11 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 void imprime_passar (int n){
 
-	if (n == 0)	printf("<text x=\"100\" y=\"400\" fill=\"black\">Passou!</text>");
+	if (n == 0)	printf("<text x=\"100\" y=\"400\" fill=\"black\" font-size=\"45\">Passou!</text>");
 
-	if (n == 1)	printf("<text x=\"300\" y=\"400\" fill=\"black\">Passou!</text>");
+	if (n == 1)	printf("<text x=\"300\" y=\"400\" fill=\"black\" font-size=\"45\">Passou!</text>");
 
-	if (n == 2)	printf("<text x=\"500\" y=\"400\" fill=\"black\">Passou!</text>");
+	if (n == 2)	printf("<text x=\"500\" y=\"400\" fill=\"black\" font-size=\"45\">Passou!</text>");
 
 }
 
@@ -294,9 +294,9 @@ void imprime(ESTADO e){
 
 	/*Imprime as cartas que estão em jogo*/
 
-	imprime_mao (100 , 400 , e , e.played[0] , 4);
-	imprime_mao (300 , 400 , e , e.played[1] , 5);
-	imprime_mao (500 , 400 , e , e.played[2] , 6);
+	imprime_mao (100 , 350 , e , e.played[0] , 4);
+	imprime_mao (300 , 350 , e , e.played[1] , 5);
+	imprime_mao (500 , 350 , e , e.played[2] , 6);
 	imprime_mao (300 , 530 , e , e.played[3] , 7);
 
 
