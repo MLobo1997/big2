@@ -106,11 +106,11 @@ int hasStraightFlush (MAO mao, int naipe, int valor){
 
 MAO add_StraightFlush (MAO mao, int naipe, int valor){
 
-	add_carta (mao , naipe , valor);
-	add_carta (mao , naipe , valorAnterior(&valor));
-	add_carta (mao , naipe , valorAnterior(&valor));
-	add_carta (mao , naipe , valorAnterior(&valor));
-	add_carta (mao , naipe , valorAnterior(&valor));
+	mao = add_carta (mao , naipe , valor);
+	mao = add_carta (mao , naipe , valorAnterior(&valor));
+	mao = add_carta (mao , naipe , valorAnterior(&valor));
+	mao = add_carta (mao , naipe , valorAnterior(&valor));
+	mao = add_carta (mao , naipe , valorAnterior(&valor));
 
 	return mao;
 }
@@ -118,21 +118,21 @@ MAO add_StraightFlush (MAO mao, int naipe, int valor){
 ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 
 
-	while (naipe < 4 && e.selecao == (MAO) 0){
+	while (naipe < 4 && e.played[e.jogador] == (MAO) 0){
 		if (hasStraightFlush (e.mao[e.jogador] , naipe , valor)){
 
-			add_StraightFlush (e. selecao , naipe , valor);
-			rem_cartas (e.mao[e.jogador] , e.selecao);
+			add_StraightFlush (e.played[e.jogador] , naipe , valor);
+			rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
 		}
 		naipe++;
 	}
 
-	for (valor++ ; valor < 13 && e.selecao == (MAO) 0 ; valor++)
-		for (naipe = 0 ; naipe < 4 && e.selecao == (MAO) 0 ; naipe++)
+	for (valor++ ; valor < 13 && e.played[e.jogador] == (MAO) 0 ; valor++)
+		for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 ; naipe++)
 			if (hasStraightFlush (e.mao[e.jogador] , naipe , valor)){
 
-			add_StraightFlush (e. selecao , naipe , valor);
-			rem_cartas (e.mao[e.jogador] , e.selecao);
+			e.played[e.jogador] = add_StraightFlush (e.played[e.jogador] , naipe , valor);
+			e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
 			}
 	
 	return e;
@@ -255,7 +255,7 @@ ESTADO autoplay (ESTADO e){
 
 		e = jogaStraightFlush(e , naipe , valor);
 
-		if (e.selecao != (MAO) 0) flag = 0; 
+		if (e.played[e.jogador] != (MAO) 0) flag = 0; 
 
 	}
 
