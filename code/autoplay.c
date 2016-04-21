@@ -77,6 +77,10 @@ int returnNaipelld (MAO mao){/**/
 	return -1;
 }
 
+/** \brief Recebe um valor de uma carta e devolve o valor anterior (no caso de ser um 3 devolve o valor de 2).
+@param VALOR
+	
+*/
 int valorAnterior (int * valor){
 
 	if (*valor == 0) *valor = 12;
