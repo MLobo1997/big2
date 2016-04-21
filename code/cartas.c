@@ -23,7 +23,7 @@ Ordem das cartas
 
 #define TAM_MAX_ESTADO      1024
 
-#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d"
+#define FORMATO "%lld_%lld_%lld_%lld_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d_%d"
 
 typedef long long int MAO;
 
@@ -31,11 +31,11 @@ struct state{
   MAO mao[4]; /*Maos de cada jogador*/
   MAO selecao; /*Cartas selecionadas*/
   MAO played[4]; /*Cartas jogadas*/
-  int cartas[4]; /*Numero de cartas*/
   int action, /*valor de jogada do joador proprio*/
    	  jogador, /*jogadr em mao*/
    	  nCartas, /*Numero de cartas em jogo por mão*/
-	  passar; /*Número de vezes consecutivas que o*/
+	  passar, /*Número de vezes consecutivas que o*/
+	  sort; /*Identifca a ordem das minhas cartas*/
 };
 
 
@@ -164,13 +164,25 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 
 	int n, v;
 
-	if (m == 3)	for(v = 0 ; v < 13 ; v++) /*Para a mão própria*/
-					for(n = 0; n < 4; n++){
-						if(carta_existe(mao , n , v)){
-							x += 40;
-							imprime_carta(x , y , e , m , n , v);
-						}
-					}
+	if (m == 3){
+		if (e.sort == 0) for(v = 0 ; v < 13 ; v++) /*Para a mão própria*/
+							for(n = 0; n < 4; n++){
+								if(carta_existe(mao , n , v)){
+									x += 40;
+									imprime_carta(x , y , e , m , n , v);
+								}
+							}
+
+		if (e.sort == 1) for(n = 0 ; n < 4 ; n++) /*Para a mão própria*/
+							for(v = 0; v < 13; v++){
+								if(carta_existe(mao , n , v)){
+									x += 40;
+									imprime_carta(x , y , e , m , n , v);
+								}
+							}
+
+	}
+
 	if (m >= 4) for(v = 0 ; v < 13 ; v++) /*Para as cartas que estão em jogo*/
 					for(n = 0; n < 4; n++){
 						if(carta_existe(mao , n , v)){
@@ -178,6 +190,7 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 							imprime_carta(x , y , e , m , n , v);
 						}
 					}
+
 	if (m <= 2) for (v = 0 ; v < 13 ; v++) /*Para as mãos dos adversários*/
 					for (n = 0 ; n < 4 ; n++){
 						if(carta_existe(mao , n , v)){
@@ -220,11 +233,22 @@ void imprime_botoes (int x , int y, ESTADO e){
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
 		}
 		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "pass.png");
+
 	y += 100;
 
 	e.action = 1;
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
+
+	e.action = 0;
+	y += 100;
+
+	if (e.sort == 1) e.sort = 0;
+	else e.sort++;
+		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "sort.png");
+
+
 }
 
 
@@ -290,7 +314,7 @@ void imprime(ESTADO e){
 	imprime_mao (190 , 010 , e , e.mao[0] , 0);
 	imprime_mao (390 , 010 , e , e.mao[1] , 1);
 	imprime_mao (590 , 010 , e , e.mao[2] , 2);
-	imprime_mao (070 , 650 , e , e.mao[3] , 3);
+	imprime_mao (50 , 650 , e , e.mao[3] , 3);
 
 	/*Imprime as cartas que estão em jogo*/
 
@@ -300,7 +324,7 @@ void imprime(ESTADO e){
 	imprime_mao (300 , 530 , e , e.played[3] , 7);
 
 
-	imprime_botoes (700 , 450 , e);
+	imprime_botoes (700 , 350 , e);
 
 	printf("</svg>\n");
 }
@@ -321,10 +345,8 @@ ESTADO shuffle (ESTADO e){
 
 			randN = random()%4;
 
-			while (e.cartas[randN] == 13) /*para o caso de o jogador ja ter as 13 cartas*/
+			while (numCartas(e.mao[randN]) == 13) /*para o caso de o jogador ja ter as 13 cartas*/
 				randN = random() % 4; 
-
-			e.cartas[randN]++;
 
 			e.mao[randN] = add_carta(e.mao[randN] , naipe , valor);
 
@@ -346,7 +368,7 @@ ESTADO shuffle (ESTADO e){
 */
 ESTADO str2estado (char* str){
 	ESTADO e;
-	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.cartas[0], &e.cartas[1], &e.cartas[2],&e.cartas[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.passar);
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.passar, &e.sort);
 	return e;
 }
 
@@ -355,7 +377,7 @@ ESTADO str2estado (char* str){
 */
 char* estado2str (ESTADO e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.passar);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.passar, e.sort);
 	return res;
 }
 
@@ -368,7 +390,6 @@ ESTADO inicializa (ESTADO e){
 	int i;
     for (i = 0 ; i < 4 ; i++){
     	e.mao[i]=0;
-    	e.cartas[i]=0;
     	e.played[i]=0;
     }
 
@@ -376,6 +397,7 @@ ESTADO inicializa (ESTADO e){
     e.nCartas = 0;
     e.selecao = 0;
     e.passar = 0;
+    e.sort = 0;
 
     return e;
 }
