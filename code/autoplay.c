@@ -54,6 +54,8 @@ void imprime_passar (int n);
 
 int maoRead (char cards[4][56] , MAO mao);
 
+int numCartas (MAO sel);
+
 int returnValuelld (MAO mao){
 
 	int valor, naipe;
@@ -139,6 +141,99 @@ ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 			e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
 			}
 	
+	return e;
+
+}
+
+MAO add_FourofaKind (MAO mao, int naipe,int valor){
+	mao = add_carta (mao , naipe , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+	
+
+	return mao;
+
+
+}
+
+MAO add_valormaisbaixo (MAO mao,MAO maoplayed){
+
+	int valor,naipe;
+
+		 for (valor=0; valor < 13 ; valor++)
+		 	for (naipe = 0 ; naipe < 4 && !(carta_existe (mao,naipe,valor)) ; naipe++); 
+
+	maoplayed = add_carta (maoplayed,naipe,valor);
+
+
+
+return maoplayed;
+
+
+}
+
+
+ESTADO jogaFourofaKind (ESTADO e, int naipe, int valor){
+
+	int numc = numCartas (e.mao[e.jogador]); /* redundante?*/
+
+	if (numc >=5){
+		 for ( ; valor < 13 && e.played[e.jogador] == (MAO) 0 ; valor++)
+		 	for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 && carta_existe (e.mao[e.jogador] , naipe , valor) ; naipe++) 
+		 		if (naipe==4){
+		 			e.played[e.jogador] = add_FourofaKind (e.played[e.jogador] , naipe , valor);
+		 			e.mao[e.jogador] = rem_carta (e.mao[e.jogador] , naipe , valor);
+
+					e.played[e.jogador] = add_valormaisbaixo (e.mao[e.jogador], e.played[e.jogador]);
+					e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+
+				}
+	}
+
+	return e;
+
+}
+
+
+MAO add3_FullHouse (MAO mao, int naipe, int valor){
+
+	mao = add_carta (mao , naipe , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+ 
+	return mao;
+
+}
+
+MAO add2_FullHouse (MAO mao, int naipe, int valor){
+
+	mao = add_carta (mao , naipe , valor);
+	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
+ 
+	return mao;
+
+}
+
+
+ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){
+
+	int valortmp;
+
+	for (valortmp = valor ; valortmp < 13 && e.played[e.jogador] == (MAO) 0 ; valortmp++)
+		 for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 && carta_existe (e.mao[e.jogador] , naipe , valortmp) ; naipe++) 
+		 	if (naipe==3){
+		 		e.played[e.jogador] = add3_FullHouse (e.played[e.jogador] , naipe , valortmp);
+		 		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+		}
+
+	for ( ; valor < 13 && e.played[e.jogador] == (MAO) 0 ; valor++)
+		 for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 && carta_existe (e.mao[e.jogador] , naipe , valor) ; naipe++) 
+			if (naipe==2){
+				e.played[e.jogador] = add2_FullHouse (e.played[e.jogador] , naipe , valor);
+		 		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);	
+			}
+
 	return e;
 
 }
