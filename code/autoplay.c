@@ -56,6 +56,10 @@ int maoRead (char cards[4][56] , MAO mao);
 
 int numCartas (MAO sel);
 
+int verificaSeguidos (int n1 , int n2);
+
+void QSort (int v[], int N);
+
 int returnValuelld (MAO mao){
 
 	int valor, naipe;
@@ -238,19 +242,81 @@ ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){
 
 }
 
-int isStraightFLush (MAO mao){
+int isStraight (MAO mao){
 
-	int naipe = 0, valor, n;
+	int i, n = 0, naipe, valor, valores[5], flag = 0, tmp[5], ntmp;
 
-	while (naipe < 4 && !carta_existe(mao , naipe , valor)){
-		for (valor = 0 ; valor < 13 && !carta_existe(mao , naipe , valor) ; valor++);
-		if (!carta_existe(mao , naipe , valor)) naipe++; 
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe (mao , naipe , valor)) valores[n] = valor, n++;
+
+	QSort (valores , 5);
+
+	for (i = 0 ; i + 1 < 5 && verificaSeguidos (valores[i] , valores[i + 1]) ; i++);
+
+	if (i == 4) flag = 1;
+
+	else{
+		for (n = 0 , i++ ; i < 5 ; n++, i++)
+			tmp[n] = valores[i];
+		for (i = 0, ntmp = 4 , n = 4 - n ; n >= 0 ; n--, i++, ntmp--)
+			valores[ntmp] = valores[n];
+		for (n = 0 , i = 4 - i ; n <= i  ; n++)
+			valores[n] = tmp[n];
+
+
+		for (i = 0 ; i + 1 < 5 && verificaSeguidos (valores[i] , valores[i + 1]) ; i++);
+
+		if (i == 4) flag = 1;
 	}
 
-	for (n = 1, valor++ ; n <= 5 && carta_existe(mao , naipe , valor) ; valor++, n++);
-
-	return (n > 5);
+	return flag;
 }
+
+int isFlush (MAO mao){
+
+	int naipes[5], i = 0, valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe, valor)) naipes[i] = naipe, i++;
+
+	for (i = 0 ; i + 1 < 5 && (naipes[i] == naipes[i + 1]) ; i++);
+
+	return (i == 4);
+
+}
+
+int isFourOfAKind (MAO mao){
+
+	int valor, naipe, counter = 0;
+
+	for (valor = 0 ; valor < 13 && counter != 4 ; valor++)
+		for (naipe = counter = 0 ; naipe < 4 && carta_existe (mao, naipe, valor) ; naipe++, counter++);
+
+	return (counter == 4);
+
+}
+
+int isFullHouse (MAO mao){
+
+	int i = 0, valores[5], valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe (mao, naipe, valor)) valores[i] = valor, i++;
+
+	QSort (valores , 5);
+
+	return ((valores[0] == valores[1] &&
+			 valores[2] == valores[3] &&
+			 valores[3] == valores[4])||
+			(valores[0] == valores[1] &&
+			 valores[1] == valores[2] &&
+			 valores[3] == valores[4]));
+
+}
+
 
 ESTADO autoplay (ESTADO e){
 
@@ -354,7 +420,7 @@ ESTADO autoplay (ESTADO e){
 
 		MAO	maoAnterior = e.played[previousPlayer(&e)];
 
-		if (isStraightFlush (maoAnterior)){
+		if (isStraight (maoAnterior) && isFlush (maoAnterior)){
 
 			naipe = 3;
 			valor = 12;
