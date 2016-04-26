@@ -127,8 +127,8 @@ ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 	while (naipe < 4 && e.played[e.jogador] == (MAO) 0){
 		if (hasStraightFlush (e.mao[e.jogador] , naipe , valor)){
 
-			add_StraightFlush (e.played[e.jogador] , naipe , valor);
-			rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+			e.played[e.jogador] = add_StraightFlush (e.played[e.jogador] , naipe , valor);
+			e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
 		}
 		naipe++;
 	}
@@ -238,6 +238,20 @@ ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){
 
 }
 
+int isStraightFLush (MAO mao){
+
+	int naipe = 0, valor, n;
+
+	while (naipe < 4 && !carta_existe(mao , naipe , valor)){
+		for (valor = 0 ; valor < 13 && !carta_existe(mao , naipe , valor) ; valor++);
+		if (!carta_existe(mao , naipe , valor)) naipe++; 
+	}
+
+	for (n = 1, valor++ ; n <= 5 && carta_existe(mao , naipe , valor) ; valor++, n++);
+
+	return (n > 5);
+}
+
 ESTADO autoplay (ESTADO e){
 
 	MAO maoAnterior;
@@ -340,19 +354,18 @@ ESTADO autoplay (ESTADO e){
 
 		MAO	maoAnterior = e.played[previousPlayer(&e)];
 
-		valor = 12;
-		naipe = 3;
+		if (isStraightFlush (maoAnterior)){
 
-		while (!carta_existe(maoAnterior , naipe , valor)){
-			
-			while (naipe >= 0 && !carta_existe (maoAnterior , naipe , valor)) naipe--;
+			naipe = 3;
+			valor = 12;
 
-			if (!carta_existe (maoAnterior , naipe , valor)) valor--;
+			while (naipe > 0 && !carta_existe (maoAnterior , naipe , valor)){
+				for (valor = 12 ; valor > 0 && !carta_existe (maoAnterior , naipe , valor) ; valor--);
+				if (!carta_existe (maoAnterior , naipe , valor)) naipe--;
+			}
+
+			e = jogaStraightFlush(e , naipe , valor);
 		}
-
-		if (!hasStraightFlush(maoAnterior , naipe , valor)) valor = naipe = 0; /*Para o caso de a jogada anterior nao ter sido um straight flush*/
-
-		e = jogaStraightFlush(e , naipe , valor);
 
 		if (e.played[e.jogador] != (MAO) 0) flag = 0; 
 
