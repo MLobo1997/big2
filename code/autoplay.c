@@ -162,9 +162,9 @@ CARTA StraightFlushValue (MAO mao, CARTA card){
 		if (!carta_existe (mao , naipe , valor)) naipe--;
 	}
 
-	if (valor == 12) valor = 0, naipe++;
+	if (naipe == 3) valor++, naipe = 0;
 
-	else valor++;
+	else naipe++;
 
 	card.valor = valor;
 	card.naipe = naipe;
@@ -226,7 +226,7 @@ ESTADO jogaFourofaKind (ESTADO e, int naipe, int valor){
 
 }
 
-CARTA FourOfAKindValue (MAO mao, CARTA card){
+CARTA fourOfAKindValue (MAO mao, CARTA card){
 
 	int valor, naipe, counter = 0;
 
@@ -239,43 +239,34 @@ CARTA FourOfAKindValue (MAO mao, CARTA card){
 	return card;
 }
 
-MAO add3_FullHouse (MAO mao, int naipe, int valor){
-
-	mao = add_carta (mao , naipe , valor);
-	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
-	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
- 
-	return mao;
-
-}
-
-MAO add2_FullHouse (MAO mao, int naipe, int valor){
-
-	mao = add_carta (mao , naipe , valor);
-	mao = add_carta (mao , naipeAnterior (&naipe) , valor);
- 
-	return mao;
-
-}
-
-
 ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){
 
-	int valortmp;
+	int valortmp;int i;naipe=0;
 
-	for (valortmp = valor ; valortmp < 13 && e.played[e.jogador] == (MAO) 0 ; valortmp++)
-		 for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 && carta_existe (e.mao[e.jogador] , naipe , valortmp) ; naipe++) 
-		 	if (naipe==3){
-		 		e.played[e.jogador] = add3_FullHouse (e.played[e.jogador] , naipe , valortmp);
-		 		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
-		}
-
-	for ( ; valor < 13 && e.played[e.jogador] == (MAO) 0 ; valor++)
-		 for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 && carta_existe (e.mao[e.jogador] , naipe , valor) ; naipe++) 
-			if (naipe==2){
-				e.played[e.jogador] = add2_FullHouse (e.played[e.jogador] , naipe , valor);
-		 		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);	
+	for (valortmp = valor,naipe=0,i=0; valortmp < 13 && i!=3 ; valortmp++)
+		 while (naipe < 4 && i!=3) {
+		 	if (carta_existe (e.mao[e.jogador] , naipe , valortmp)) {
+		 		
+		 		e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valortmp);
+				i++;
 			}
+			naipe++;	
+		}
+		if (i!=3) e.played [e.jogador] = 0;
+		else e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+
+
+	for (valor=0,i=0,naipe=0; valor < 13 && i!=2 ; valor++)
+		 while (naipe < 4 && i!=2) {
+		 	if (carta_existe (e.mao[e.jogador] , naipe , valortmp)) {
+		 		
+		 		e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valortmp);
+				i++;
+			}
+			naipe++;	
+		}
+		if (i!=2) e.played [e.jogador] = 0;
+		else e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
 
 	return e;
 
@@ -354,6 +345,24 @@ int isFullHouse (MAO mao){
 			(valores[0] == valores[1] &&
 			 valores[1] == valores[2] &&
 			 valores[3] == valores[4]));
+
+}
+
+CARTA fullHouseValue(MAO mao, CARTA card){
+
+	int valor = 12, naipe = 3, counter = 0;
+
+	while (valor >= 0 && counter < 3){
+		for (naipe = 3, counter = 0; naipe >= 0; naipe--)
+			if (carta_existe(mao, naipe, valor)) counter++;
+
+		if (counter < 3) valor--;
+	}
+
+	card.valor = valor++;
+	card.naipe = 0;
+
+	return card;
 
 }
 
@@ -473,7 +482,7 @@ ESTADO autoplay (ESTADO e){
 
 	    if (flag && isFourOfAKind(maoAnterior)){
 
-			card = FourOfAKindValue(maoAnterior, card);
+			card = fourOfAKindValue(maoAnterior, card);
 
 	    	e = jogaFourofaKind(e, card.naipe , card.valor);
 
@@ -484,19 +493,31 @@ ESTADO autoplay (ESTADO e){
 	    	if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
-		if (flag && isFullHouse (maoAnterior)){
+		if (flag && isFullHouse(maoAnterior)){
+
+			card = fullHouseValue(maoAnterior, card);
+
+			e = jogaFullHouse(e, 0, card.valor);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaFourofaKind(e, 0, 0); 
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaStraightFlush(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+		}
+
+		if (flag && isFlush(maoAnterior)){
+
 
 
 			if (e.played[e.jogador] != (MAO) 0) flag = 0; 
 		}
 
-		if (flag && isFlush (maoAnterior)){
-
-
-			if (e.played[e.jogador] != (MAO) 0) flag = 0; 
-		}
-
-		if (flag && isStraight (maoAnterior)){
+		if (flag && isStraight(maoAnterior)){
 
 
 
