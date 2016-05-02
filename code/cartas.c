@@ -104,13 +104,26 @@ long long int rem_carta(long long int est, int naipe, int valor) {
 @param selecao 	Seleçao de cartas que são retiradas
 */
 
-MAO rem_cartas(MAO est , MAO rem){
+MAO rem_cartas(MAO est, MAO rem){
 
 	rem = ~rem;
 
 	est = est & rem;
 
 	return est;
+}
+
+/** \brief Adicionada todas as cartas de uma determinada seleção numa mao
+@param mao 		Mao a que se vão adicionar as cartas
+@param selecao 	Seleçao de cartas que são adicionadas
+*/
+
+MAO add_cartas(MAO est, MAO add){
+
+	est |= add;
+
+	return est; 
+
 }
 
 

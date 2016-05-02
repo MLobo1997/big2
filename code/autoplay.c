@@ -64,6 +64,8 @@ int verificaSeguidos (int n1 , int n2);
 
 void QSort (int v[], int N);
 
+MAO add_cartas(MAO est, MAO add);
+
 int returnValuelld (MAO mao){
 
 	int valor, naipe;
@@ -197,8 +199,6 @@ MAO add_valormaisbaixo (MAO mao,MAO maoplayed){
 
 
 	return maoplayed;
-
-
 }
 
 
@@ -239,38 +239,111 @@ CARTA fourOfAKindValue (MAO mao, CARTA card){
 	return card;
 }
 
-ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){
 
-	int valortmp;int i;naipe=0;
+ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 
-	for (valortmp = valor,naipe=0,i=0; valortmp < 13 && i!=3 ; valortmp++)
-		 while (naipe < 4 && i!=3) {
-		 	if (carta_existe (e.mao[e.jogador] , naipe , valortmp)) {
+	int counter;
+	int acaba = 0;
+	MAO backup = e.mao[e.jogador], tmp;
+
+
+	for (counter = 0; valor < 13  && !acaba ; valor++){
+		for (naipe = 0, counter = 0; naipe < 4 && counter != 3; naipe++)
+		 	if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 		 		
-		 		e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valortmp);
-				i++;
-			}
-			naipe++;	
-		}
-		if (i!=3) e.played [e.jogador] = 0;
-		else e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+		 		e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
+				counter++;
+			}	
 
+		if (counter != 3) e.played [e.jogador] = (MAO) 0;
+		else acaba = 1;
+	}
 
-	for (valor=0,i=0,naipe=0; valor < 13 && i!=2 ; valor++)
-		 while (naipe < 4 && i!=2) {
-		 	if (carta_existe (e.mao[e.jogador] , naipe , valortmp)) {
+	if (e.played[e.jogador] != 0){
+
+		acaba = 0;
+		e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+	
+		for (valor = 0, counter = 0, naipe = 0; valor < 13 && !acaba ; valor++){
+			for (naipe = 0, counter = 0; naipe < 4 && counter != 2 ; naipe++)
+		 		if (carta_existe(e.mao[e.jogador] , naipe , valor)){
 		 		
-		 		e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valortmp);
-				i++;
-			}
-			naipe++;	
-		}
-		if (i!=2) e.played [e.jogador] = 0;
-		else e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+		 			tmp = add_carta(tmp , naipe , valor);
+					counter++;
+				}
 
+			if (counter != 2) tmp = (MAO) 0;
+
+			else acaba = 1;
+		}
+
+		if (acaba){
+			e.played[e.jogador] = add_cartas(e.played[e.jogador], tmp);
+			e.mao[e.jogador] = rem_cartas(e.mao[e.jogador], e.played[e.jogador]);
+		}
+		else e.mao[e.jogador] = backup;
+	}
 	return e;
-
 }
+
+
+
+int hasFlush_naipeinicial (ESTADO e, int naipe,int valor){
+	int flag=0; int valortmp_1 =12;int valortmp_2=valor; int i_1=0; int i_2=0;
+
+		while (valortmp_1 >= valor && valortmp_2<valor) {
+
+			if (carta_existe (e.mao[e.jogador] ,naipe ,valortmp_1)){	  /*verifica nos valores de [valor,12] */
+
+				valortmp_1--; 
+				i_1 ++;
+			}      
+
+
+			if (carta_existe (e.mao[e.jogador] ,naipe ,valortmp_2)){ /* verifica nos valores de [0,valor[ */
+				
+			  valortmp_2 ++;
+			  i_2 ++;
+			} 		
+		}
+		if (i_1>=1 && i_1+i_2 >=5) flag = 1;
+return (flag);
+}
+
+ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
+		int i=0;int valortmp =12;
+
+		if (hasFlush_naipeinicial(e,naipe,valor)){					/* verifica o naipe q recebe */
+			while (valortmp>0 && i!=6){
+
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+				e.played[e.jogador]= add_carta (e.played[e.jogador], naipe,valor); 
+				i++;
+				}
+
+
+			valortmp --;	
+			}
+		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);	
+
+		}
+		for (i=0,naipe++ ; naipe < 4 && e.played[e.jogador] == (MAO) 0  ; naipe++){  /* verifica os naipes seguintes */
+			for (valor=0; valor < 13 ; valor++){ 
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)) {
+
+					e.played[e.jogador]=add_carta (e.played[e.jogador], naipe,valor); 
+					i++;
+				 }
+			}
+			if (i!=5){
+					  e.played[e.jogador] = 0;
+					 }
+			  	
+		}
+		if (i==5) e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
+return e;
+}
+
 
 int isStraight (MAO mao){
 
@@ -359,7 +432,7 @@ CARTA fullHouseValue(MAO mao, CARTA card){
 		if (counter < 3) valor--;
 	}
 
-	card.valor = valor++;
+	card.valor = ++valor;
 	card.naipe = 0;
 
 	return card;
@@ -510,14 +583,14 @@ ESTADO autoplay (ESTADO e){
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
-		if (flag && isFlush(maoAnterior)){
+		if (flag && isFlush(maoAnterior) && !isStraight(maoAnterior)){
 
 
 
 			if (e.played[e.jogador] != (MAO) 0) flag = 0; 
 		}
 
-		if (flag && isStraight(maoAnterior)){
+		if (flag && isStraight(maoAnterior) && !isFlush(maoAnterior)){
 
 
 
