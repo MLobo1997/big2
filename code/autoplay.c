@@ -3,6 +3,10 @@
 #include "autoplay.h"
 #include "verificaJogada.h"
 
+/** \brief Recebendo uma mão APENAS com uma carta devolve o valor da mesma.
+@param MAO Mão apenas com uma carta.
+@return VALOR O valor da carta (inteiro entre 0 e 12)
+*/
 int returnValuelld (MAO mao){
 
 	int valor, naipe;
@@ -14,8 +18,11 @@ int returnValuelld (MAO mao){
 	return -1;
 }
 
-
-int returnNaipelld (MAO mao){/**/
+/** \brief Recebendo uma mão APENAS com uma carta devolve o naipe da mesma.
+@param MAO Mão apenas com uma carta.
+@return NAIPE O naipe da carta (inteiro entre 0 e 3)
+*/
+int returnNaipelld (MAO mao){
 
 	int valor, naipe;
 
@@ -27,7 +34,9 @@ int returnNaipelld (MAO mao){/**/
 }
 
 /** \brief Recebe um valor de uma carta e devolve o valor anterior (no caso de ser um 3 devolve o valor de 2).
-@param VALOR
+
+@param VALOR O valor da carta (inteiro entre 0 e 12)
+@return VALORANTERIOR O valor da carta imediatamente inferior numa ordem funçao de valores (inteiro entre 0 e 12)
 	
 */
 int valorAnterior (int * valor){
@@ -39,6 +48,12 @@ int valorAnterior (int * valor){
 	return *valor;
 }
 
+/** \brief Recebe um nai+e de uma carta e devolve o valor anterior (no caso de ser um 3 devolve o naipe 2).
+
+@param NAIPE O naipe da carta (inteiro entre 0 e 3)
+@return NAIPEANTERIOR O valor da naipe imediatamente inferior numa ordem funçao de naipe (inteiro entre 0 e 3)
+	
+*/
 int naipeAnterior (int * naipe){
 
 	if (*naipe == 0) *naipe = 3;
@@ -92,25 +107,6 @@ ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 
 }
 
-CARTA StraightFlushValue (MAO mao, CARTA card){
-
-	int naipe = 3, valor = 12;
-
-	while (naipe > 0 && !carta_existe (mao , naipe , valor)){
-		for (valor = 12 ; valor > 0 && !carta_existe (mao , naipe , valor) ; valor--);
-		if (!carta_existe (mao , naipe , valor)) naipe--;
-	}
-
-	if (naipe == 3) valor++, naipe = 0;
-
-	else naipe++;
-
-	card.valor = valor;
-	card.naipe = naipe;
-
-	return card;
-}
-
 MAO add_FourofaKind (MAO mao, int valor){
 	mao = add_carta (mao , 0 , valor);
 	mao = add_carta (mao , 1 , valor);
@@ -143,7 +139,7 @@ ESTADO jogaFourofaKind (ESTADO e, int naipe, int valor){
 
 	int numc = numCartas (e.mao[e.jogador]); /* redundante?*/
 
-	if (numc >=5){
+	if (numc >= 5){
 		while (valor < 13 && e.played[e.jogador] == (MAO) 0 && naipe < 4){
 	 		for (naipe = 0 ; naipe < 4 && carta_existe (e.mao[e.jogador] , naipe , valor) ; naipe++);
 	 		if (naipe < 4) valor++;
@@ -176,6 +172,16 @@ CARTA fourOfAKindValue (MAO mao, CARTA card){
 	return card;
 }
 
+int isFourOfAKind (MAO mao){
+
+	int valor, naipe, counter = 0;
+
+	for (valor = 0 ; valor < 13 && counter != 4 ; valor++)
+		for (naipe = counter = 0 ; naipe < 4 && carta_existe (mao, naipe, valor) ; naipe++, counter++);
+
+	return (counter == 4);
+
+}
 
 ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 
@@ -221,6 +227,43 @@ ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 		else e.mao[e.jogador] = backup;
 	}
 	return e;
+}
+
+int isFullHouse (MAO mao){
+
+	int i = 0, valores[5], valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe (mao, naipe, valor)) valores[i] = valor, i++;
+
+	QSort (valores , 5);
+
+	return ((valores[0] == valores[1] &&
+			 valores[2] == valores[3] &&
+			 valores[3] == valores[4])||
+			(valores[0] == valores[1] &&
+			 valores[1] == valores[2] &&
+			 valores[3] == valores[4]));
+
+}
+
+CARTA fullHouseValue(MAO mao, CARTA card){
+
+	int valor = 12, naipe = 3, counter = 0;
+
+	while (valor >= 0 && counter < 3){
+		for (naipe = 3, counter = 0; naipe >= 0; naipe--)
+			if (carta_existe(mao, naipe, valor)) counter++;
+
+		if (counter < 3) valor--;
+	}
+
+	card.valor = ++valor;
+	card.naipe = 0;
+
+	return card;
+
 }
 
 
@@ -282,6 +325,90 @@ return e;
 }
 
 
+
+int isFlush (MAO mao){
+
+	int naipes[5], i = 0, valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe, valor)) naipes[i] = naipe, i++;
+
+	for (i = 0 ; i + 1 < 5 && (naipes[i] == naipes[i + 1]) ; i++);
+
+	return (i == 4);
+
+}
+
+CARTA flushOrStraightValue (MAO mao, CARTA card){
+
+	int naipe = 3, valor = 12;
+
+ 	while (valor >= 0 && !carta_existe(mao, naipe, valor)){
+		for (naipe = 3 ; naipe >= 0 && !carta_existe(mao, naipe, valor) ; naipe--);
+ 		
+ 		if (naipe < 0) valor--;
+ 	}
+
+ 	if (valor == 12) valor = 0, naipe++;
+
+ 	else valor++;
+
+ 	card.valor = valor;
+
+ 	card.naipe = naipe;
+
+	return card;
+}
+/** \brief Recebe um valor e um naipe e tenta verifica se consegue jogar alguma sequência em que o elemento superior tenha aquele valor e aquele naipe ou um superior.
+@param MAO Mão que vai ser lida.
+@param NAIPE Naipe mínimo a ser jogado.
+@param VALOR Valor mínimo a ser jogado.
+@return MAO Mão com uma sequência ou vazia.
+*/
+MAO addStraight (MAO mao, int naipe, int valor){
+
+	int counter;
+
+	MAO new = (MAO) 0;
+
+	for (counter = 5 ; naipe < 4 && !carta_existe(mao, naipe, valor) ; naipe++);
+
+	if (naipe < 4) new = add_carta(new, naipe, valor);
+
+	for (valorAnterior(&valor), counter-- ; counter >= 0 && naipe < 4 ; valorAnterior(&valor), counter--){
+
+		for (naipe = 0; naipe < 4 && !carta_existe(mao, naipe, valor); naipe++);
+
+		if (naipe < 4) new = add_carta(new, naipe, valor);
+	}
+
+	if (counter >= 0) new = (MAO) 0;
+
+	return new;
+}
+/** \brief Tenta jogar uma sequência.
+@param ESTADO Estado do jogo em que vão ser feitas as jogadas.
+@param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
+@param VALOR Valor mínimo a ser jogado.
+@return ESTADO Estado pós as eventuais alterações.
+*/
+ESTADO jogaStraight (ESTADO e, int naipe, int valor){
+
+	while (naipe < 4 && e.played[e.jogador] == (MAO) 0){
+		e.played[e.jogador] = addStraight(e.mao[e.jogador], naipe, valor);
+
+		naipe++;
+	}
+
+	for (valor++ ; e.played[e.jogador] == (MAO) 0 && valor < 13 ; valor++)
+		e.played[e.jogador] = addStraight(e.mao[e.jogador], 0, valor);
+
+	if (e.played[e.jogador] != (MAO) 0) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador], e.played[e.jogador]);
+
+	return e;
+}
+
 int isStraight (MAO mao){
 
 	int i, n = 0, naipe, valor, valores[5], flag = 0, tmp[5], ntmp;
@@ -311,69 +438,6 @@ int isStraight (MAO mao){
 	}
 
 	return flag;
-}
-
-int isFlush (MAO mao){
-
-	int naipes[5], i = 0, valor, naipe;
-
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
-			if (carta_existe(mao , naipe, valor)) naipes[i] = naipe, i++;
-
-	for (i = 0 ; i + 1 < 5 && (naipes[i] == naipes[i + 1]) ; i++);
-
-	return (i == 4);
-
-}
-
-
-int isFourOfAKind (MAO mao){
-
-	int valor, naipe, counter = 0;
-
-	for (valor = 0 ; valor < 13 && counter != 4 ; valor++)
-		for (naipe = counter = 0 ; naipe < 4 && carta_existe (mao, naipe, valor) ; naipe++, counter++);
-
-	return (counter == 4);
-
-}
-
-int isFullHouse (MAO mao){
-
-	int i = 0, valores[5], valor, naipe;
-
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
-			if (carta_existe (mao, naipe, valor)) valores[i] = valor, i++;
-
-	QSort (valores , 5);
-
-	return ((valores[0] == valores[1] &&
-			 valores[2] == valores[3] &&
-			 valores[3] == valores[4])||
-			(valores[0] == valores[1] &&
-			 valores[1] == valores[2] &&
-			 valores[3] == valores[4]));
-
-}
-
-CARTA fullHouseValue(MAO mao, CARTA card){
-
-	int valor = 12, naipe = 3, counter = 0;
-
-	while (valor >= 0 && counter < 3){
-		for (naipe = 3, counter = 0; naipe >= 0; naipe--)
-			if (carta_existe(mao, naipe, valor)) counter++;
-
-		if (counter < 3) valor--;
-	}
-
-	card.valor = ++valor;
-	card.naipe = 0;
-
-	return card;
-
 }
 
 
@@ -483,7 +547,7 @@ ESTADO autoplay (ESTADO e){
 
 		if (isStraight(maoAnterior) && isFlush(maoAnterior)){ /*StraightFlush*/
 
-			card = StraightFlushValue(maoAnterior, card);
+			card = flushOrStraightValue(maoAnterior, card);
 
 			e = jogaStraightFlush(e , card.naipe , card.valor);
 
@@ -522,14 +586,48 @@ ESTADO autoplay (ESTADO e){
 
 		if (flag && isFlush(maoAnterior) && !isStraight(maoAnterior)){
 
+			card = flushOrStraightValue(maoAnterior, card);
 
+			e = jogaFlush(e, card.naipe, card.valor);
 
-			if (e.played[e.jogador] != (MAO) 0) flag = 0; 
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaFullHouse(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaFourofaKind(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaStraightFlush(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
 		if (flag && isStraight(maoAnterior) && !isFlush(maoAnterior)){
 
+			card = flushOrStraightValue(maoAnterior, card);
 
+			e = jogaStraight(e, card.naipe, card.valor);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+/*
+			else e = jogaFlush(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+*/
+			else e = jogaFullHouse(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaFourofaKind(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
+
+			else e = jogaStraightFlush(e, 0, 0);
+
+			if (e.played[e.jogador] != (MAO) 0) flag = 0;
 
 		}
 

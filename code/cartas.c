@@ -151,6 +151,3 @@ ESTADO inicializa (ESTADO e){
 
     return e;
 }
-
-
-

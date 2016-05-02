@@ -41,11 +41,17 @@ int isStraight (MAO mao);
 
 int isFlush (MAO mao);
 
+CARTA flushValue (MAO mao, CARTA card);
+
 int isFourOfAKind (MAO mao);
 
 int isFullHouse (MAO mao);
 
 CARTA fullHouseValue(MAO mao, CARTA card);
+
+MAO addStraight (MAO mao, int naipe, int valor);
+
+ESTADO jogaStraight (ESTADO e, int naipe, int valor);
 
 ESTADO autoplay (ESTADO e);
 
