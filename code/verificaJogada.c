@@ -1,35 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-/**
-Ordem dos naipes
-*/
-#define NAIPES		"DCHS"
-/**
-Ordem das cartas
-*/
-#define VALORES		"3456789TJQKA2"
-
-#define FORMATO "%lld_%lld_%lld_%lld_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d_%d"
-
-typedef long long int MAO;
-
-struct state{
-  MAO mao[4]; /*Maos de cada jogador*/
-  MAO selecao; /*Cartas selecionadas*/
-  MAO played[4]; /*Cartas jogadas*/
-  int action, /*valor de jogada do joador proprio*/
-   	  jogador, /*jogadr em mao*/
-   	  nCartas, /*Numero de cartas em jogo por mão*/
-	  passar, /*Número de vezes consecutivas que o*/
-	  sort; /*Identifca a ordem das minhas cartas*/
-};
-
-typedef struct state ESTADO;
-
-int carta_existe(long long int est, int naipe, int valor);
+#include "cartas.h"
+#include "view.h"
+#include "autoplay.h"
+#include "verificaJogada.h"
 
 void valueToStr (char str[], int valor , int naipe){
 
