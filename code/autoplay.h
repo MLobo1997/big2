@@ -53,6 +53,9 @@ MAO addStraight (MAO mao, int naipe, int valor);
 
 ESTADO jogaStraight (ESTADO e, int naipe, int valor);
 
+
+CARTA flushOrStraightValue (MAO mao, CARTA card);
+
 ESTADO autoplay (ESTADO e);
 
 

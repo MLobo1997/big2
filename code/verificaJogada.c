@@ -222,7 +222,7 @@ int cartaMaior (char carta1[4] , char carta2[4]){
 	return flag; 
 }
 
-int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no work*/
+int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 	char maior[4], maiorAnterior[4];
 
@@ -245,8 +245,7 @@ int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no
 	return flag;
 }
 
-int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no work*/
-
+int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ 
 	char maior[4], maiorAnterior[4];
 
 	int flag = 0;
@@ -271,13 +270,57 @@ int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ /*Why u no
 
 	return flag;
 }
-/*
-int verificaCinco (char cartas [4][56] , char cartasAnteriores [4][56]){
 
-	return 0;
+/** \brief Verifica se um straight flush é superior ao outro.
+@param MAO E.seleçao, terá de ser superior.
+@param MAO Mao jogada anteriormente, terá de ser inferior.
+@return BOOL 1 caso as condiçoes se confirmem, 0 caso contrário.
+*/
+
+int comparaStraightFlush (MAO mao, MAO maoAnterior){
+
+	CARTA maior, maiorAnterior;
+
+	maiorAnterior = flushOrStraightValue (maoAnterior, maiorAnterior);
+
+	maior = flushOrStraightValue(mao, maior);
+
+	return (maior.valor > maiorAnterior.valor ||
+		   (maior.valor == maiorAnterior.valor &&
+		    maior.naipe > maiorAnterior.naipe));
+}
+
+/** \brief Verifica se um Four of a Kind é superior ao outro.
+@param MAO E.seleçao, terá de ser superior.
+@param MAO Mao jogada anteriormente, terá de ser inferior.
+@return BOOL 1 caso as condiçoes se confirmem, 0 caso contrário.
+*/
+
+int comparaFourOfAKind (MAO mao, MAO maoAnterior){
+
+	CARTA valor, valorAnterior;
+
+	valor = fourOfAKindValue(mao, valor);
+
+	valorAnterior = fourOfAKindValue(maoAnterior, valorAnterior);
+
+	return (valor.valor > valorAnterior.valor);
 
 }
-*/
+
+int verificaCinco (MAO mao , MAO maoAnterior){
+
+	int flag = 0;
+
+	if (isStraight(maoAnterior) && isFlush(maoAnterior)) /*Se a jogada anterior tiver sido um straight flush*/
+		if ((isStraight(mao) && isFlush(mao)) && comparaStraightFlush(mao, maoAnterior)) flag = 1;
+
+	if (!flag && isFourOfAKind(maoAnterior))
+		if ((isStraight(mao) && isFlush(mao)) || (isFourOfAKind(mao) && comparaFourOfAKind(mao, maoAnterior))) flag = 1;
+
+	return flag;
+}
+
 
 /** \brief Verifica se uma determinada jogada é valida
 @param ESTADO recebe o estado atual
@@ -346,56 +389,3 @@ int verificaJogada (ESTADO e){
 
 	return flag; 
 }
-
-/*
-int main (){
-
-	MAO mao = 133;
-
-	char cartas[3][56];
-
-	int n;
-
-	n = maoRead (cartas , mao);
-
-	while (n--)
-		printf("%s\n", cartas[n]);
-
-	return 0;
-
-}
-*/
-/*
-int main (){
-
-	int n;
-
-	n = returnNaipe("2_S");
-
-	printf("%d\n", n);
-
-	return 0;
-}
-*/
-
-/*
-int main (){
-
-	int array[1000], N, i;
-
-	printf("Elementos?:\n");
-	scanf ("%d" , &N);
-
-	for (i = 0 ; i < N ; i++){
-		printf("Elemento nº%d\n", i);
-		scanf ("%d" , &array[i]);
-	}
-
-	QSort (array , N);
-
-	for (i = 0 ; i < N ; i++)
-		printf("%d\n" , array[i]);
-
-	return 0;
-}
-*/
