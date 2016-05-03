@@ -289,43 +289,6 @@ int hasFlush_naipeinicial (ESTADO e, int naipe,int valor){
 		if (i_1>=1 && i_1+i_2 >=5) flag = 1;
 return (flag);
 }
-
-ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
-		int i=0;int valortmp =12;
-
-		if (hasFlush_naipeinicial(e,naipe,valor)){					/* verifica o naipe q recebe */
-			while (valortmp>0 && i!=6){
-
-				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
-				e.played[e.jogador]= add_carta (e.played[e.jogador], naipe,valor); 
-				i++;
-				}
-
-
-			valortmp --;	
-			}
-		e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);	
-
-		}
-		for (i=0,naipe++ ; naipe < 4 && e.played[e.jogador] == (MAO) 0  ; naipe++){  /* verifica os naipes seguintes */
-			for (valor=0; valor < 13 ; valor++){ 
-				if (carta_existe (e.mao[e.jogador] , naipe , valor)) {
-
-					e.played[e.jogador]=add_carta (e.played[e.jogador], naipe,valor); 
-					i++;
-				 }
-			}
-			if (i!=5){
-					  e.played[e.jogador] = 0;
-					 }
-			  	
-		}
-		if (i==5) e.mao[e.jogador] = rem_cartas (e.mao[e.jogador] , e.played[e.jogador]);
-return e;
-}
-
-
-
 int isFlush (MAO mao){
 
 	int naipes[5], i = 0, valor, naipe;
@@ -338,6 +301,42 @@ int isFlush (MAO mao){
 
 	return (i == 4);
 
+}
+
+ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
+
+	int i = 0; int valortmp; int verifica = 0;
+
+	for (valortmp = 12 ; valortmp >= 0 && i < 5 ; valortmp--){	/* verifica o naipe q recebe */
+
+		if (carta_existe (e.mao[e.jogador] , naipe , valortmp)){
+
+			e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valortmp); 
+			i++;
+			if (valortmp > valor) verifica = 1;
+		}	
+	}
+
+	if (i == 5 && verifica) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+	else e.played[e.jogador] = 0;
+
+			
+
+	for (naipe++ ; naipe < 4 && e.played[e.jogador] == 0 ; naipe++){  /* verifica os naipes seguintes */
+		for (i = 0, valor = 0; valor < 13 && i < 5 ; valor++)
+			if (carta_existe(e.mao[e.jogador] , naipe , valor)){
+
+				e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valor); 
+				i++;
+			}
+		
+		if (i < 5) e.played[e.jogador] = 0;
+		else e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+			  	
+
+	}
+
+	return e;
 }
 
 CARTA flushValue (MAO mao, CARTA card){
@@ -637,11 +636,11 @@ ESTADO autoplay (ESTADO e){
 			e = jogaStraight(e, card.naipe, card.valor);
 
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;
-/*
+
 			else e = jogaFlush(e, 0, 0);
 
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;
-*/
+
 			else e = jogaFullHouse(e, 0, 0);
 
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;

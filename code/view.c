@@ -89,7 +89,7 @@ void imprime_mao (int x , int y , ESTADO e , MAO mao , int m){
 	if (m <= 2) for (v = 0 ; v < 13 ; v++) /*Para as mãos dos adversários*/
 					for (n = 0 ; n < 4 ; n++){
 						if(carta_existe(mao , n , v)){
-							y += 14;
+							y += 20;
 							x -= 5;
 							imprime_carta (x , y , e , m , n , v);
 						}
