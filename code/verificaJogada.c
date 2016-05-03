@@ -281,9 +281,9 @@ int comparaStraightFlush (MAO mao, MAO maoAnterior){
 
 	CARTA maior, maiorAnterior;
 
-	maiorAnterior = flushOrStraightValue (maoAnterior, maiorAnterior);
+	maiorAnterior = straightValue (maoAnterior, maiorAnterior);
 
-	maior = flushOrStraightValue(mao, maior);
+	maior = straightValue(mao, maior);
 
 	return (maior.valor > maiorAnterior.valor ||
 		   (maior.valor == maiorAnterior.valor &&
@@ -308,6 +308,24 @@ int comparaFourOfAKind (MAO mao, MAO maoAnterior){
 
 }
 
+int comparaFullHouse (MAO mao, MAO maiorAnterior){
+
+	CARTA valor, valorAnterior;
+
+	valor = fullHouseValue(mao, valor);
+
+	valorAnterior = fullHouseValue(maoAnterior, valorAnterior);
+
+	return (valor.valor >)
+
+}
+
+/** \brief Verifica se uma jogada de 5 cartas é valida.
+@param MAO Jogada ser feita.
+@param MAO Mão da jogada anterior.
+@return BOOl 1 caso seja possível fazer a jogada. 
+
+*/
 int verificaCinco (MAO mao , MAO maoAnterior){
 
 	int flag = 0;
@@ -317,6 +335,9 @@ int verificaCinco (MAO mao , MAO maoAnterior){
 
 	if (!flag && isFourOfAKind(maoAnterior))
 		if ((isStraight(mao) && isFlush(mao)) || (isFourOfAKind(mao) && comparaFourOfAKind(mao, maoAnterior))) flag = 1;
+
+	if (!flag && isFullHouse(maiorAnterior))
+		if((isStraight(mao) && isFlush(mao)) || isFourOfAKind(mao) || (isFullHouse(mao) && comparaFullHouse(mao, maoAnterior))) flag = 1;
 
 	return flag;
 }

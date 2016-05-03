@@ -23,6 +23,8 @@ ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor);
 
 CARTA StraightFlushValue (MAO mao, CARTA card);
 
+CARTA straightValue (MAO mao, CARTA card);
+
 MAO add_FourofaKind (MAO mao, int valor);
 
 MAO add_valormaisbaixo (MAO mao,MAO maoplayed);

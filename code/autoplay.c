@@ -340,7 +340,7 @@ int isFlush (MAO mao){
 
 }
 
-CARTA flushOrStraightValue (MAO mao, CARTA card){
+CARTA flushValue (MAO mao, CARTA card){ /*ESTAS TE A ESQUECER DE CASOS DE LOOP*/
 
 	int naipe = 3, valor = 12;
 
@@ -439,7 +439,32 @@ int isStraight (MAO mao){
 
 	return flag;
 }
+/** \brief Calcula o menor valor superior a uma determinada sequência (incluindo straightflush's).
+@param MAO Sequência a ser analisada.
+@param CARTA transportadora de resultado.
+@return CARTA Valor e naipe mínimo a ser jogado.
+*/
 
+CARTA straightValue (MAO mao, CARTA card){
+
+	int naipe = 0, valor = 0;
+
+	while (valor < 13 && !carta_existe(mao, naipe, valor)){
+		for (naipe = 0; naipe < 4 && !carta_existe(mao, naipe, valor) ; naipe++);
+		if (!carta_existe(mao, naipe, valor)) valor++;
+	}
+
+	while (carta_existe(mao, naipe, valor)){
+		for (valor++, naipe = 0 ; naipe < 4 && !carta_existe(mao, naipe, valor) ; naipe++);
+		if (carta_existe(mao, naipe, valor)) card.naipe = naipe, card.valor = valor;
+	}
+
+	if (card.naipe == 3) card.naipe = 0, card.valor++;
+
+	else card.naipe++;
+
+	return card;
+}
 
 ESTADO autoplay (ESTADO e){
 
@@ -547,7 +572,7 @@ ESTADO autoplay (ESTADO e){
 
 		if (isStraight(maoAnterior) && isFlush(maoAnterior)){ /*StraightFlush*/
 
-			card = flushOrStraightValue(maoAnterior, card);
+			card = straightValue(maoAnterior, card);
 
 			e = jogaStraightFlush(e , card.naipe , card.valor);
 
@@ -586,7 +611,7 @@ ESTADO autoplay (ESTADO e){
 
 		if (flag && isFlush(maoAnterior) && !isStraight(maoAnterior)){
 
-			card = flushOrStraightValue(maoAnterior, card);
+			card = flushValue(maoAnterior, card);
 
 			e = jogaFlush(e, card.naipe, card.valor);
 
@@ -607,7 +632,7 @@ ESTADO autoplay (ESTADO e){
 
 		if (flag && isStraight(maoAnterior) && !isFlush(maoAnterior)){
 
-			card = flushOrStraightValue(maoAnterior, card);
+			card = straightValue(maoAnterior, card);
 
 			e = jogaStraight(e, card.naipe, card.valor);
 
