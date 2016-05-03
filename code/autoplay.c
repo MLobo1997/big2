@@ -340,7 +340,7 @@ int isFlush (MAO mao){
 
 }
 
-CARTA flushValue (MAO mao, CARTA card){ /*ESTAS TE A ESQUECER DE CASOS DE LOOP*/
+CARTA flushValue (MAO mao, CARTA card){
 
 	int naipe = 3, valor = 12;
 
@@ -376,14 +376,14 @@ MAO addStraight (MAO mao, int naipe, int valor){
 
 	if (naipe < 4) new = add_carta(new, naipe, valor);
 
-	for (valorAnterior(&valor), counter-- ; counter >= 0 && naipe < 4 ; valorAnterior(&valor), counter--){
+	for (valorAnterior(&valor), counter-- ; counter && naipe < 4 ; valorAnterior(&valor)){
 
 		for (naipe = 0; naipe < 4 && !carta_existe(mao, naipe, valor); naipe++);
 
-		if (naipe < 4) new = add_carta(new, naipe, valor);
+		if (naipe < 4) new = add_carta(new, naipe, valor), counter--;
 	}
 
-	if (counter >= 0) new = (MAO) 0;
+	if (counter) new = (MAO) 0;
 
 	return new;
 }

@@ -224,7 +224,7 @@ int cartaMaior (char carta1[4] , char carta2[4]){
 
 int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 
-	char maior[4], maiorAnterior[4];
+	char maior[4], valorAnterior[4];
 
 	int flag = 0;
 
@@ -234,11 +234,11 @@ int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 		else strcpy (maior , cartas[1]);
 
-		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (maiorAnterior , cartasAnteriores[0]);
+		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (valorAnterior , cartasAnteriores[0]);
 
-		else strcpy (maiorAnterior , cartasAnteriores[1]);
+		else strcpy (valorAnterior , cartasAnteriores[1]);
 
-		if (cartaMaior (maior , maiorAnterior)) flag = 1;
+		if (cartaMaior (maior , valorAnterior)) flag = 1;
 
 	}
 
@@ -246,7 +246,7 @@ int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 }
 
 int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ 
-	char maior[4], maiorAnterior[4];
+	char maior[4], valorAnterior[4];
 
 	int flag = 0;
 
@@ -258,13 +258,13 @@ int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 		if (!cartaMaior (maior , cartas[2])) strcpy (maior , cartas[2]);
 
-		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (maiorAnterior , cartasAnteriores[0]);
+		if (cartaMaior (cartasAnteriores[0] , cartasAnteriores[1])) strcpy (valorAnterior , cartasAnteriores[0]);
 
-		else strcpy (maiorAnterior , cartasAnteriores[1]);
+		else strcpy (valorAnterior , cartasAnteriores[1]);
 
-		if (!cartaMaior (maiorAnterior , cartasAnteriores[2])) strcpy (maiorAnterior , cartasAnteriores[2]);
+		if (!cartaMaior (valorAnterior , cartasAnteriores[2])) strcpy (valorAnterior , cartasAnteriores[2]);
 
-		if (cartaMaior (maior , maiorAnterior)) flag = 1;
+		if (cartaMaior (maior , valorAnterior)) flag = 1;
 
 	}
 
@@ -279,15 +279,15 @@ int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 int comparaStraightFlush (MAO mao, MAO maoAnterior){
 
-	CARTA maior, maiorAnterior;
+	CARTA maior, valorAnterior;
 
-	maiorAnterior = straightValue (maoAnterior, maiorAnterior);
+	valorAnterior = straightValue (maoAnterior, valorAnterior);
 
 	maior = straightValue(mao, maior);
 
-	return (maior.valor > maiorAnterior.valor ||
-		   (maior.valor == maiorAnterior.valor &&
-		    maior.naipe > maiorAnterior.naipe));
+	return (maior.valor > valorAnterior.valor ||
+		   (maior.valor == valorAnterior.valor &&
+		    maior.naipe > valorAnterior.naipe));
 }
 
 /** \brief Verifica se um Four of a Kind é superior ao outro.
@@ -308,7 +308,14 @@ int comparaFourOfAKind (MAO mao, MAO maoAnterior){
 
 }
 
-int comparaFullHouse (MAO mao, MAO maiorAnterior){
+/** \brief Verifica se um Full House é superior ao outro.
+@param MAO E.seleçao, terá de ser superior.
+@param MAO Mao jogada anteriormente, terá de ser inferior.
+@return BOOL 1 caso as condiçoes se confirmem, 0 caso contrário.
+*/
+
+
+int comparaFullHouse (MAO mao, MAO maoAnterior){
 
 	CARTA valor, valorAnterior;
 
@@ -316,9 +323,50 @@ int comparaFullHouse (MAO mao, MAO maiorAnterior){
 
 	valorAnterior = fullHouseValue(maoAnterior, valorAnterior);
 
-	return (valor.valor >)
+	return (valor.valor > valorAnterior.valor);
 
 }
+
+/** \brief Verifica se um Flush é superior ao outro.
+@param MAO E.seleçao, terá de ser superior.
+@param MAO Mao jogada anteriormente, terá de ser inferior.
+@return BOOL 1 caso as condiçoes se confirmem, 0 caso contrário.
+*/
+
+int comparaFlush (MAO mao, MAO maoAnterior){
+
+	CARTA valor, valorAnterior;
+
+	valor = flushValue(mao, valor);
+
+	valorAnterior = flushValue(maoAnterior, valorAnterior);
+
+	return (valor.naipe > valorAnterior.naipe ||(
+			valor.naipe == valorAnterior.naipe &&
+			valor.valor > valorAnterior.valor));
+
+}
+
+/** \brief Verifica se um Straight é superior ao outro.
+@param MAO E.seleçao, terá de ser superior.
+@param MAO Mao jogada anteriormente, terá de ser inferior.
+@return BOOL 1 caso as condiçoes se confirmem, 0 caso contrário.
+*/
+
+int comparaStraight (MAO mao, MAO maoAnterior){
+
+	CARTA valor, valorAnterior;
+
+	valor = straightValue(mao, valor);
+
+	valorAnterior = straightValue(maoAnterior, valorAnterior);
+
+	return (valor.valor > valorAnterior.valor ||(
+			valor.valor == valorAnterior.valor &&
+			valor.naipe > valorAnterior.naipe));
+
+}
+
 
 /** \brief Verifica se uma jogada de 5 cartas é valida.
 @param MAO Jogada ser feita.
@@ -336,8 +384,14 @@ int verificaCinco (MAO mao , MAO maoAnterior){
 	if (!flag && isFourOfAKind(maoAnterior))
 		if ((isStraight(mao) && isFlush(mao)) || (isFourOfAKind(mao) && comparaFourOfAKind(mao, maoAnterior))) flag = 1;
 
-	if (!flag && isFullHouse(maiorAnterior))
-		if((isStraight(mao) && isFlush(mao)) || isFourOfAKind(mao) || (isFullHouse(mao) && comparaFullHouse(mao, maoAnterior))) flag = 1;
+	if (!flag && isFullHouse(maoAnterior))
+		if ((isStraight(mao) && isFlush(mao)) || isFourOfAKind(mao) || (isFullHouse(mao) && comparaFullHouse(mao, maoAnterior))) flag = 1;
+
+	if (!flag && isFlush(maoAnterior) && !isStraight(maoAnterior)) 
+		if ((isStraight(mao) && isFlush(mao)) || isFourOfAKind(mao) || isFullHouse(mao) || (isFlush(mao) && comparaFlush(mao, maoAnterior))) flag = 1; 
+
+	if (!flag && isStraight(maoAnterior) && !isFlush(maoAnterior))
+		if ((isStraight(mao) && isFlush(mao)) || isFourOfAKind(mao) || isFullHouse(mao) || isFlush(mao) || (isStraight(mao) && comparaStraight(mao, maoAnterior))) flag = 1;
 
 	return flag;
 }
@@ -403,10 +457,10 @@ int verificaJogada (ESTADO e){
 
 		if (nCartas == 3 && verificaTres (cartas , cartasAnteriores)) flag = 1;
 
-/*	if (e.nCartas == 5 && prosseguir)
+	if (e.nCartas == 5 && prosseguir)
 
-		if (nCartas == 5 && verificaCinco (cartas ,  cartasAnteriores)) flag = 1;
-*/
+		if (nCartas == 5 && verificaCinco (e.selecao, e.played[previousPlayer(&e)])) flag = 1;
+
 
 	return flag; 
 }
