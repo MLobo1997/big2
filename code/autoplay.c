@@ -313,7 +313,7 @@ ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
 
 			e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valortmp); 
 			i++;
-			if (valortmp > valor) verifica = 1;
+			if (valortmp >= valor) verifica = 1;
 		}	
 	}
 
