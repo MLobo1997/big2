@@ -109,7 +109,11 @@ void imprime_botoes (int x , int y, ESTADO e){
 
 	char script[10240];
 
+	e.action = 4;
+		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "help.png");
 
+	y+=100;
 	e.action = 2;
 
 		if (verificaJogada (e)){
@@ -166,6 +170,8 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 */
 void imprime(ESTADO e){
 
+	ESTADO tmp;
+
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
@@ -189,6 +195,11 @@ void imprime(ESTADO e){
 	e.jogador = 0;
 	}
 
+	if (e.action == 4){/*SUGESTAO*/
+	tmp = autoplay (e);
+	e.selecao = tmp.played[3];
+
+	}
 	e.action = 0;
 
 	while (e.jogador != 3) e = autoplay (e);
@@ -219,7 +230,7 @@ void imprime(ESTADO e){
 	imprime_mao (300 , 530 , e , e.played[3] , 7);
 
 
-	imprime_botoes (700 , 350 , e);
+	imprime_botoes (700 , 250 , e);
 
 	printf("</svg>\n");
 }
