@@ -170,7 +170,6 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 */
 void imprime(ESTADO e){
 
-	ESTADO tmp;
 
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
@@ -196,10 +195,17 @@ void imprime(ESTADO e){
 	}
 
 	if (e.action == 4){/*SUGESTAO*/
-	tmp = autoplay (e);
-	e.selecao = tmp.played[3];
 
+		ESTADO tmp;
+
+		if (e.selecao != (MAO) 0) e.selecao = (MAO) 0;
+
+		else{
+		tmp = autoplay (e);
+		e.selecao = tmp.played[3];
+		}
 	}
+	
 	e.action = 0;
 
 	while (e.jogador != 3) e = autoplay (e);
