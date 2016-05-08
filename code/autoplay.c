@@ -289,6 +289,7 @@ int hasFlush_naipeinicial (ESTADO e, int naipe,int valor){
 		if (i_1>=1 && i_1+i_2 >=5) flag = 1;
 return (flag);
 }
+
 int isFlush (MAO mao){
 
 	int naipes[5], i = 0, valor, naipe;
@@ -307,33 +308,48 @@ ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
 
 	int i = 0; int valortmp; int verifica = 0;
 
-	for (valortmp = 12 ; valortmp >= 0 && i < 5 ; valortmp--){	/* verifica o naipe q recebe */
+	if(carta_existe(e.mao[e.jogador], 0, 0))/*Para o caso de estar a abrir o jogo*/
+		for ( ; naipe < 4 && e.played[e.jogador] == 0 ; naipe++){ 
+			for (i = 0, valor = 0; valor < 13 && i < 5 ; valor++)
+				if (carta_existe(e.mao[e.jogador] , naipe , valor)){
 
-		if (carta_existe (e.mao[e.jogador] , naipe , valortmp)){
+					e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valor); 
+					i++;
+				}
+		
+			if (i < 5) e.played[e.jogador] = 0;
+			else e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+		}	  	
 
-			e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valortmp); 
-			i++;
-			if (valortmp >= valor) verifica = 1;
-		}	
-	}
 
-	if (i == 5 && verifica) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
-	else e.played[e.jogador] = 0;
+	else{
+
+		for (valortmp = 12 ; valortmp >= 0 && i < 5 ; valortmp--){	/* verifica o naipe q recebe */
+
+			if (carta_existe (e.mao[e.jogador] , naipe , valortmp)){
+
+				e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valortmp); 
+				i++;
+				if (valortmp >= valor) verifica = 1;
+			}	
+		}
+
+		if (i == 5 && verifica) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+		else e.played[e.jogador] = 0;
 
 			
 
-	for (naipe++ ; naipe < 4 && e.played[e.jogador] == 0 ; naipe++){  /* verifica os naipes seguintes */
-		for (i = 0, valor = 0; valor < 13 && i < 5 ; valor++)
-			if (carta_existe(e.mao[e.jogador] , naipe , valor)){
+		for (naipe++ ; naipe < 4 && e.played[e.jogador] == 0 ; naipe++){  /* verifica os naipes seguintes */
+			for (i = 0, valor = 0; valor < 13 && i < 5 ; valor++)
+				if (carta_existe(e.mao[e.jogador] , naipe , valor)){
 
-				e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valor); 
-				i++;
-			}
+					e.played[e.jogador]= add_carta(e.played[e.jogador], naipe, valor); 
+					i++;
+				}
 		
-		if (i < 5) e.played[e.jogador] = 0;
-		else e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
-			  	
-
+			if (i < 5) e.played[e.jogador] = 0;
+			else e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+		}
 	}
 
 	return e;
@@ -408,6 +424,11 @@ ESTADO jogaStraight (ESTADO e, int naipe, int valor){
 	return e;
 }
 
+/** \brief Verifica se uma determinada jogada é uma sequência.
+@param MAO jogada de 5 cartas.
+@return BOOL 1 caso a jogada seja uma sequência, 0 caso contrário.
+*/
+
 int isStraight (MAO mao){
 
 	int i, n = 0, naipe, valor, valores[5], flag = 0, tmp[5], ntmp;
@@ -465,6 +486,30 @@ CARTA straightValue (MAO mao, CARTA card){
 	return card;
 }
 
+/**	\brief Tenta fazer os bots abrir o jogo com combinações.
+@param ESTADO Nada jogado.
+@return ESTADO Joga uma combinação ou então nada.
+*/
+
+ESTADO abreJogo (ESTADO e){
+
+	MAO backup = e.mao[e.jogador];
+
+	e = jogaStraight(e, 0, 0);
+
+	if (!carta_existe(e.played[e.jogador], 0, 0)) e.played[e.jogador] = (MAO) 0, e.mao[e.jogador] = backup, e = jogaFlush(e, 0, 0);
+
+	if (!carta_existe(e.played[e.jogador], 0, 0)) e.played[e.jogador] = (MAO) 0, e.mao[e.jogador] = backup, e = jogaFullHouse(e, 0, 0);
+
+	if (!carta_existe(e.played[e.jogador], 0, 0)) e.played[e.jogador] = (MAO) 0, e.mao[e.jogador] = backup, e = jogaFourofaKind(e, 0, 0);
+
+	if (!carta_existe(e.played[e.jogador], 0, 0)) e.played[e.jogador] = (MAO) 0, e.mao[e.jogador] = backup, e = jogaStraightFlush(e, 0, 0);
+
+	if (!carta_existe(e.played[e.jogador], 0, 0)) e.played[e.jogador] = (MAO) 0, e.mao[e.jogador] = backup;
+
+	return e;
+}
+
 ESTADO autoplay (ESTADO e){
 
 	MAO maoAnterior;
@@ -486,19 +531,26 @@ ESTADO autoplay (ESTADO e){
 		e.played[3] = (MAO) 0;
 	}
 
-	if (e.nCartas == 0){ 	for (proceder = 1, valor = 0 ; valor < 13 && proceder ; valor++)
-								for (naipe = 0 ; naipe < 4 && proceder ; naipe++)
-									if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+	if (e.nCartas == 0){
 
-										e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
-										e.mao[e.jogador] = rem_carta (e.mao[e.jogador] , naipe , valor);
+		if (carta_existe(e.mao[e.jogador], 0, 0)){ /*Para o caso de estar à abrir o jogo*/
+			e = abreJogo(e);
+			if (e.played[e.jogador] != (MAO) 0) e.nCartas = 5;
+		}
 
-										e.nCartas = 1;
-										proceder = 0;
-									}
+		for (valor = 0 ; valor < 13 && e.played[e.jogador] == (MAO) 0; valor++)				
+			for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 ; naipe++)				
+				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
+
+					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
+					e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor);
+
+					e.nCartas = 1;
+				}
 									
-							flag = 0;				
+		flag = 0;
 	}
+	
 
 	if (e.nCartas == 1 && flag){
 		maoAnterior = e.played[previousPlayer(&e)];
