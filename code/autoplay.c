@@ -261,29 +261,6 @@ CARTA fullHouseValue(MAO mao, CARTA card){
 }
 
 
-
-int hasFlush_naipeinicial (ESTADO e, int naipe,int valor){
-	int flag=0; int valortmp_1 =12;int valortmp_2=valor; int i_1=0; int i_2=0;
-
-		while (valortmp_1 >= valor && valortmp_2<valor) {
-
-			if (carta_existe (e.mao[e.jogador] ,naipe ,valortmp_1)){	  /*verifica nos valores de [valor,12] */
-
-				valortmp_1--; 
-				i_1 ++;
-			}      
-
-
-			if (carta_existe (e.mao[e.jogador] ,naipe ,valortmp_2)){ /* verifica nos valores de [0,valor[ */
-				
-			  valortmp_2 ++;
-			  i_2 ++;
-			} 		
-		}
-		if (i_1>=1 && i_1+i_2 >=5) flag = 1;
-return (flag);
-}
-
 int isFlush (MAO mao){
 
 	int naipes[5], i = 0, valor, naipe;
