@@ -186,11 +186,10 @@ int isFourOfAKind (MAO mao){
 ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 
 	int counter;
-	int acaba = 0;
-	MAO backup = e.mao[e.jogador], tmp;
+	MAO backup = e.mao[e.jogador], tmp = (MAO) 0;
 
 
-	for (counter = 0; valor < 13  && !acaba ; valor++){
+	for (counter = 0; valor < 13  && e.played[e.jogador] == (MAO) 0 ; valor++){
 		for (naipe = 0, counter = 0; naipe < 4 && counter != 3; naipe++)
 		 	if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 		 		
@@ -199,33 +198,28 @@ ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 			}	
 
 		if (counter != 3) e.played [e.jogador] = (MAO) 0;
-		else acaba = 1;
 	}
 
-	if (e.played[e.jogador] != 0){
 
-		acaba = 0;
-		e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
+	e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]);
 	
-		for (valor = 0, counter = 0, naipe = 0; valor < 13 && !acaba ; valor++){
-			for (naipe = 0, counter = 0; naipe < 4 && counter != 2 ; naipe++)
-		 		if (carta_existe(e.mao[e.jogador] , naipe , valor)){
-		 		
-		 			tmp = add_carta(tmp , naipe , valor);
-					counter++;
-				}
+	for (valor = 0, counter = 0, naipe = 0; valor < 13 && e.played[e.jogador] != (MAO) 0 && tmp == (MAO) 0; valor++){
+		for (naipe = 0, counter = 0; naipe < 4 && counter < 2 ; naipe++)
+	 		if (carta_existe(e.mao[e.jogador] , naipe , valor)){
+	 		
+	 			tmp = add_carta(tmp , naipe , valor);
+				counter++;
+			}
 
-			if (counter != 2) tmp = (MAO) 0;
-
-			else acaba = 1;
-		}
-
-		if (acaba){
-			e.played[e.jogador] = add_cartas(e.played[e.jogador], tmp);
-			e.mao[e.jogador] = rem_cartas(e.mao[e.jogador], e.played[e.jogador]);
-		}
-		else e.mao[e.jogador] = backup;
+		if (counter != 2) tmp = (MAO) 0;
 	}
+
+	if (tmp != (MAO) 0){
+		e.played[e.jogador] = add_cartas(e.played[e.jogador], tmp);
+		e.mao[e.jogador] = rem_cartas(e.mao[e.jogador], e.played[e.jogador]);
+	}
+	else e.mao[e.jogador] = backup, e.played[e.jogador] = (MAO) 0;
+
 	return e;
 }
 
