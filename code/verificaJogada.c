@@ -3,6 +3,12 @@
 #include "autoplay.h"
 #include "verificaJogada.h"
 
+
+/** \brief Ao receber o valor e o naipe de uma carta converte-a para uma string de identificação com a estrutura "(valor)_(naipe)"
+@param STRING Array onde será colocada a identificação da carta.
+@param INT Valor da carta.
+@param INT Naipe da carta.
+*/
 void valueToStr (char str[], int valor , int naipe){
 
 	char *suit = NAIPES;
@@ -13,8 +19,9 @@ void valueToStr (char str[], int valor , int naipe){
 
 
 
-/**
-Devolver o valor de 0 a 12 de uma carta
+/** \brief Devolver o valor de 0 a 12 de uma carta
+@param STRING Carta identificada.
+@return INT Valor da carta.
 */
 
 int returnValue (char carta[4]){
@@ -27,8 +34,9 @@ int returnValue (char carta[4]){
 	return i;
 }
 
-/**
-Devolver o naipe de 0 a 3 de uma carta
+/** \brief Devolver o naipe de 0 a 3 de uma carta
+@param STRING Carta identificada.
+@return INT Valor da carta.
 */
 
 int returnNaipe (char carta[4]){
