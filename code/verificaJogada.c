@@ -102,6 +102,11 @@ void swap(int v[], int i, int j){
 }
 
 
+/** \brief Particiona e troca os elementos de um array.
+@param ARRAY Array a ser ordenado
+@param INT Número de elementos
+@return INT Posição de centro
+*/
 int partition (int v[], int N){
 
 	int i = 0, p = 0;
@@ -117,6 +122,10 @@ int partition (int v[], int N){
 	swap (v , p , N-1);
 	return p;
 }
+/** \brief Ordena um array
+@param ARRAY Array a ser ordenado.
+@param INT Número de elementos do array.
+*/
 
 void QSort (int v[], int N){
 
@@ -130,6 +139,9 @@ void QSort (int v[], int N){
 }
 
 /** \brief Recebe dois valores de cartas e verifica se são seguidas
+@param INT Valor nº 1.
+@param INT Valor nº 2.
+@return INT 1 se forem seguidos, 0 caso contrário.
 */
 int verificaSeguidos (int n1 , int n2){
 
