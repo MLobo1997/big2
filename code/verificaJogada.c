@@ -76,12 +76,17 @@ int maoRead (char cards[4][56] , MAO mao){
 	return n;
 }
 
+/** \brief Identifica o número de cartas numa determinada mão.
+@param MAO A mão.
+@return INT Número de cartas
+*/
+
 int numCartas (MAO sel){
 
 
 	int nCartas, count;
 
-	for (nCartas = count = 0; count < 56 ; sel = sel >> 1 , count++)
+	for (nCartas = count = 0; count <= 52 ; sel = sel >> 1 , count++)
 			if (sel & ((MAO) 1)) nCartas++;
 
 	return nCartas;

@@ -1,5 +1,6 @@
 #include "jogador_inteligente.h"
 #include "read.h"
+#include "jogar.h"
 
 /** \brief Ao receber o valor e o naipe de uma carta converte-a para uma string de identificação com a estrutura "(valor)(naipe)"
 @param STRING Array onde será colocada a identificação da carta.
@@ -69,7 +70,11 @@ int returnNaipe (char carta[3]){
 
 	return i;
 }
-
+/** \brief Converte cartas identificadas num long long int.
+@param ARRAY Identificação das cartas num array.
+@param INT número de cartas no array.
+@return MAO Mão que se encontra no array.
+*/
 MAO maoRead (char cards[13][3], int N){
 
 	MAO mao = (MAO) 0;
@@ -85,11 +90,57 @@ MAO maoRead (char cards[13][3], int N){
 	return mao;
 }
 
+/** \brief Coloca no estado os valores da ultima jogada.
+@param JOGO Estado.
+@param STRING Identificação da ação.
+@param STRING Identificação das cartas.
+@param INT Número de cartas na 2ª string.
+@return INT 1 caso o processo tenha terminado.
+*/
+int readMove (JOGO e, char *action, char cards[13][3], int N){
+
+	if (strcmp(action, "JOGOU") == 0){
+		e->played = maoRead(cards, N - 1);
+		e->nCartas = N - 1;
+		e->passar = 0;
+	}
+	return 1;
+}
+
+/** \brief Lê os comandos que não estão seguidos de uma mão, atualizando o estado.
+@param JOGO Estado.
+@param STRING Comando.
+@return INT 1 caso o processo tenha terminado.
+*/
 int readAction (JOGO e, char *action){
 
-	if (!strcmp(action, "PASSOU")) e->passar++;
+	if (strcmp(action, "PASSOU") == 0){
 
-	if (!strcmp(action, "JOGADA"));
+		if (e->passar == 2){ /*Se for a 3ª passagem consecutiva, os parâmetros de jogada são reinicializados*/
+			e->passar = 0; 
+			e->nCartas = 0;
+			e->played = (MAO) 0;
+		}
+
+		else e->passar++; /*Senão o e->passar aumenta*/
+	}
+
+	if (strcmp(action, "JOGADA") == 0) jogar(e);
+
+	return 1;
+}
+/** Lê a mão que nos foi atribuída.
+@param JOGO Estado.
+@param STRING Identificação da ação.
+@param STRING Identificação das cartas.
+@param INT Número de cartas na 2ª string.
+@return INT 1 caso o processo tenha terminado.
+*/
+
+int readHand (JOGO e, char *action, char cards[13][3], int N){
+
+		if (strcmp(action, "MAO") == 0)
+		e->mao = maoRead(cards, N - 1);
 
 	return 1;
 }

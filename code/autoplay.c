@@ -260,7 +260,10 @@ CARTA fullHouseValue(MAO mao, CARTA card){
 
 }
 
-
+/** \brief Verifica se uma determinada jogada é um flush.
+@param MAO jogada de 5 cartas.
+@return BOOL 1 caso a jogada seja um flush, 0 caso contrário.
+*/
 int isFlush (MAO mao){
 
 	int naipes[5], i = 0, valor, naipe;
@@ -274,7 +277,12 @@ int isFlush (MAO mao){
 	return (i == 4);
 
 }
-
+/** \brief Tenta jogar um flush.
+@param ESTADO Estado do jogo em que vão ser feitas as jogadas.
+@param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
+@param VALOR Valor mínimo a ser jogado.
+@return ESTADO Estado pós as eventuais alterações.
+*/
 ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
 
 	int i = 0; int valortmp; int verifica = 0;
@@ -325,7 +333,11 @@ ESTADO jogaFlush (ESTADO e, int naipe, int valor){ /* 5 cartas do mesmo naipe */
 
 	return e;
 }
-
+/** \brief Calcula o menor valor superior para um determinado flush.
+@param MAO Flush a ser analisada.
+@param CARTA transportadora de resultado.
+@return CARTA Valor e naipe mínimo a ser jogado.
+*/
 CARTA flushValue (MAO mao, CARTA card){
 
 	int naipe = 3, valor = 12;

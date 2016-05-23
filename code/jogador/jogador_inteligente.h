@@ -6,10 +6,10 @@ typedef long long int MAO;
 
 typedef struct jogo{
 
-	MAO played[3], /*identifa as maos jogadas pelos outros jogadores na ultima ronda*/
+	MAO played, /*identifa a ultima mao jogada*/
 		mao; /*Minha mão*/
-	int jogador, /*identifica o jogador atual*/
-		passar, /*identifica a sequencia de passagem*/
+	int	passar, /*identifica a sequencia de passagem*/
+		nCartas, /*Número de cartas a ser jogadas*/
 		eu; /*Identifica o jogador que eu represento*/
 
 } *JOGO;

@@ -1,5 +1,6 @@
 #include "jogador_inteligente.h"
 #include "read.h"
+#include "jogar.h"
 
 /** \brief Devolve o índice da carta
 
@@ -7,7 +8,7 @@
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		O índice correspondente à carta
 */
-int indice(int naipe, int valor) {
+int indice(int naipe, int valor){
 	return naipe * 13 + valor;
 }
 
@@ -18,9 +19,9 @@ int indice(int naipe, int valor) {
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		O novo estado
 */
-long long int add_carta(long long int est, int naipe, int valor) {
+MAO add_carta(MAO est, int naipe, int valor){
 	int idx = indice(naipe, valor);
-	return est | ((long long int) 1 << idx);
+	return est | ((MAO) 1 << idx);
 }
 
 /** \brief Remove uma carta do estado
@@ -30,9 +31,9 @@ long long int add_carta(long long int est, int naipe, int valor) {
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		O novo estado
 */
-long long int rem_carta(long long int est, int naipe, int valor) {
+MAO rem_carta(MAO est, int naipe, int valor){
 	int idx = indice(naipe, valor);
-	return est & ~((long long int) 1 << idx);
+	return est & ~((MAO) 1 << idx);
 }
 
 /** \brief Elimina todas as cartas de uma determinada seleção numa mao
@@ -70,19 +71,14 @@ MAO add_cartas(MAO est, MAO add){
 @param valor	O valor da carta (inteiro entre 0 e 12)
 @return		1 se a carta existe e 0 caso contrário
 */
-int carta_existe(long long int est, int naipe, int valor){
+int carta_existe(MAO est, int naipe, int valor){
 	int idx = indice(naipe, valor);
 	return (est >> idx) & 1;
 }
 
 int initiate (JOGO e){ /*Inicializa as informações do jogo*/
 
-	int i;
-
-	for (i = 0 ; i < 3 ; i++)
-		e->played[i] = (MAO) 0;
-
-	e->jogador = 0;
+	e->played= (MAO) 0;
 	e->passar = 0;
 	e->eu = 0;
 
