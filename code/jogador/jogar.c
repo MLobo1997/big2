@@ -1,6 +1,38 @@
 #include "jogador_inteligente.h"
 #include "read.h"
 #include "jogar.h"
+
+/** \brief Recebendo uma mão APENAS com uma carta devolve o valor da mesma.
+@param MAO Mão apenas com uma carta.
+@return VALOR O valor da carta (inteiro entre 0 e 12)
+*/
+int returnValuelld (MAO mao){
+
+	int valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe , valor)) return valor;
+
+	return -1;
+}
+
+/** \brief Recebendo uma mão APENAS com uma carta devolve o naipe da mesma.
+@param MAO Mão apenas com uma carta.
+@return NAIPE O naipe da carta (inteiro entre 0 e 3)
+*/
+int returnNaipelld (MAO mao){
+
+	int valor, naipe;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++)
+		for (valor = 0 ; valor < 13 ; valor++)
+			if (carta_existe(mao , naipe , valor)) return naipe;
+
+	return -1;
+}
+
+
 /** \brief subsitui os valores de dois elementos do array um pelo outro.
 @param INT Índice do 1º elemento
 @param INT Índice do 2º elemento
@@ -633,7 +665,7 @@ int joga5(JOGO e){
 
 		if (mao[i] != (MAO) 0) i++; 
 
-		mao[i] = jogaFourofaKind(e, card.naipe, card.valor); /*Tenta jogar four of a kind*/
+		mao[i] = jogaFourofaKind(e, 0, 0); /*Tenta jogar four of a kind*/
 
 		if (mao[i] != (MAO) 0) i++; 
 
@@ -695,6 +727,122 @@ int joga5(JOGO e){
 	return mao[i];
 }
 
+/** \brief Joga 3 cartas conforme o jogo.
+@param INT Valor mínimo a ser jogado.
+@return MAO Mão vazia ou com um trio.
+*/
+MAO jogaTrio (MAO tmp, int valor){
+	
+	int counter;
+	MAO mao = (MAO) 0;
+	int naipe;
+
+	for (counter = 0 ; valor < 13  && mao == (MAO) 0 ; valor++){
+		for (naipe = 0, counter = 0; naipe < 4 && counter != 3; naipe++)
+		 	if (carta_existe (tmp , naipe , valor)){
+		 		
+		 		mao = add_carta (mao , naipe , valor);
+				counter++;
+			}	
+
+		if (counter != 3) mao = (MAO) 0;
+	}
+
+	return mao;
+
+}
+/** \brief Joga 3 cartas conforme o jogo.
+@param JOGO Estado do jogo.
+@return MAO Mão vazia ou com um trio.
+*/
+MAO joga3 (JOGO e){
+
+	int minValue = returnValuelld (e->played);
+
+	return jogaTrio(e->mao, minValue + 1);
+}
+
+/** \brief Joga 3 cartas conforme o jogo.
+@param INT Valor mínimo a ser jogado.
+@param INT Naipe mínimo a ser jogado.
+@return MAO Mão vazia ou com um trio.
+*/
+MAO jogaPar (MAO mao, int valor, int minNaipe){
+
+	int counter = 0, flag = 1, naipe;
+	MAO tmp = (MAO) 0;
+
+	for (naipe = 3 ; counter < 2 && naipe < 4 ; naipe--)
+		if (carta_existe(mao , naipe , valor)){
+	 			if (naipe >= minNaipe) flag = 0;
+	 			tmp = add_carta(tmp , naipe , valor);
+				counter++;
+		}
+
+	if (flag && counter != 2) tmp = (MAO) 0;
+
+	for (valor++ ; valor < 13 && tmp == (MAO) 0; valor++){
+		for (naipe = counter = 0; naipe < 4 && counter < 2 ; naipe++)
+	 		if (carta_existe(mao , naipe , valor)){
+	 		
+	 			tmp = add_carta(tmp , naipe , valor);
+				counter++;
+			}
+
+		if (counter != 2) tmp = (MAO) 0;
+	}
+
+	return tmp;
+}
+
+/** \brief Joga 2 cartas conforme o jogo.
+@param JOGO Estado do jogo.
+@return MAO Mão vazia ou com um par.
+*/
+MAO joga2 (JOGO e){
+
+	int minValue = returnValuelld(e->played);
+	int minNaipe = returnNaipelld(e->played); 
+
+	return jogaPar(e->mao, minValue, minNaipe + 1);
+}
+
+/** \brief Joga 1 cartas conforme o jogo.
+@param INT Valor mínimo a ser jogado.
+@param INT Naipe mínimo a ser jogado.
+@return MAO Mão vazia ou com uma carta.
+*/
+MAO jogaUma (MAO tmp, int valor, int naipe){
+
+	MAO mao = (MAO) 0;
+
+	while (naipe < 4 && mao == (MAO) 0){
+		if (carta_existe(tmp, naipe, valor))
+			add_carta(mao, naipe, valor);
+		naipe++;
+	}
+
+	for (valor++ ; valor < 13 && mao == (MAO) 0 ; valor++)
+		for (naipe = 0 ; naipe < 4 && mao == (MAO) 0 ; naipe++)
+			if (carta_existe(tmp, naipe, valor))
+				add_carta(mao, naipe, valor);
+
+	return mao;
+}
+
+/** \brief Joga 1 carta conforme o jogo.
+@param JOGO Estado do jogo.
+@return MAO Mão vazia ou com uma carta.
+*/
+MAO joga1 (JOGO e){
+
+	int minValue = returnValuelld(e->played);
+	int minNaipe = returnNaipelld(e->played); 
+
+	return jogaUma(e->mao, minValue, minNaipe + 1);
+}
+
+
 /** \brief Joga.
 @param Jogo e.
 @return	1 se a carta existe e 0 caso contrário.
@@ -705,8 +853,28 @@ int jogar (JOGO e){
 
 	if (e->nCartas == 5) mao = joga5(e);
 
-	e->mao = rem_cartas(e->mao, mao);
-	e->played = mao;
+	if (e->nCartas == 3) mao = joga3(e);
 
+	if (e->nCartas == 2) mao = joga2(e);
+
+	if (e->nCartas == 1) mao = joga1(e);
+
+
+
+	if (mao != (MAO) 0){
+		e->mao = rem_cartas(e->mao, mao);
+		e->played = mao;
+		e->passar = 0;
+	}
+
+	else{
+		if (e->passar == 2){ /*Se for a 3ª passagem consecutiva, os parâmetros de jogada são reinicializados*/
+			e->passar = 0; 
+			e->nCartas = 0;
+			e->played = (MAO) 0;
+		}
+		else e->passar++; /*Senão o e->passar aumenta*/
+	}
+	
 	return 1;
 }
