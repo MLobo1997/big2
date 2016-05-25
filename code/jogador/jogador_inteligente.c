@@ -1,6 +1,7 @@
 #include "jogador_inteligente.h"
 #include "read.h"
 #include "jogar.h"
+#include "output.h"
 
 /** \brief Devolve o índice da carta
 
@@ -75,12 +76,16 @@ int carta_existe(MAO est, int naipe, int valor){
 	int idx = indice(naipe, valor);
 	return (est >> idx) & 1;
 }
+/** \brief Inicializa as informações do jogo.
+@param JOGO Estado do jogo, onde o parametros vao ser todos colocados a zero.
+@return INT 1, caso a função tenha corrido devidamente.
+*/
+int initiate (JOGO e){ 
 
-int initiate (JOGO e){ /*Inicializa as informações do jogo*/
-
-	e->played= (MAO) 0;
+	e->played = (MAO) 0;
+	e->mao = (MAO) 0;
 	e->passar = 0;
-	e->eu = 0;
+	e->nCartas = 0;
 
 	return 1;
 }

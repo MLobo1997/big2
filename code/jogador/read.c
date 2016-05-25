@@ -1,44 +1,7 @@
 #include "jogador_inteligente.h"
 #include "read.h"
 #include "jogar.h"
-
-/** \brief Ao receber o valor e o naipe de uma carta converte-a para uma string de identificação com a estrutura "(valor)(naipe)"
-@param STRING Array onde será colocada a identificação da carta.
-@param INT Valor da carta.
-@param INT Naipe da carta.
-*/
-void valueToStr (char str[], int valor , int naipe){
-
-	char *suit = NAIPES;
-	char *rank = VALORES;
-
-	sprintf (str , "%c%c" , rank[valor] , suit[naipe]);
-}
-
-/** \brief Coloca num array strings com o formato "(valor)(naipe)" e devolve o número de strings colocadas
-@param MATRIZ poderá ter até 56 cartas (strings de 3 elementos).
-@param MAO O long long int que será lido.
-@return NUM número de cartas.
-*/
-
-int maoWrite (char cards[52][3] , MAO mao){
-
-	int valor, naipe, n;
-
-	char tmp[3];
-
-	for (naipe = n = 0 ; naipe <= 3 ; naipe++)
-		for (valor = 0 ; valor <= 12 ; valor++){
-			if (mao & ((MAO) 1)){
-				valueToStr (tmp , valor , naipe);
-				strcpy (cards[n] , tmp);
-				n++;
-			}
-			mao = mao >> 1;
-		}
-
-	return n;
-}
+#include "output.h"
 
 /** \brief Devolver o valor de 0 a 12 de uma carta
 @param STRING Carta identificada.
@@ -48,7 +11,7 @@ int maoWrite (char cards[52][3] , MAO mao){
 int returnValue (char carta[3]){
 
 	int i;
-	char *rank = VALORES;
+	char rank[14] = VALORES;
 
 	for (i = 0; carta[0] != rank[i] ; i++);
 
@@ -64,7 +27,7 @@ int returnNaipe (char carta[3]){
 
 	int i;
 	
-	char *suit = NAIPES;
+	char suit[5] = NAIPES;
 
 	for (i = 0; carta[1] != suit[i] ; i++);
 
@@ -129,6 +92,7 @@ int readAction (JOGO e, char *action){
 
 	return 1;
 }
+
 /** Lê a mão que nos foi atribuída.
 @param JOGO Estado.
 @param STRING Identificação da ação.
@@ -139,8 +103,36 @@ int readAction (JOGO e, char *action){
 
 int readHand (JOGO e, char *action, char cards[13][3], int N){
 
-		if (strcmp(action, "MAO") == 0)
-		e->mao = maoRead(cards, N - 1);
+	if (strcmp(action, "MAO") == 0)
+	e->mao = maoRead(cards, N - 1);
 
 	return 1;
+}
+
+int readInput (char *action, char cards[13][3]){
+
+	int n = 0, i;
+
+	char input[150], *delim = " \n", *tokens;
+
+	if (fgets(input, 150, stdin) != NULL){
+
+		tokens = strtok(input, delim);
+
+		n++;
+
+		strcpy (action, tokens);
+
+		tokens = strtok(NULL, delim);
+
+		for (i = 0 ; tokens != NULL ; i++){
+
+			strcpy(cards[i], tokens);
+			n++;
+			tokens = strtok(NULL, delim);
+		}
+
+	}
+
+	return n;
 }

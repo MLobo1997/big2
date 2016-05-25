@@ -1,6 +1,7 @@
 #include "jogador_inteligente.h"
 #include "read.h"
 #include "jogar.h"
+#include "output.h"
 
 /** \brief Recebendo uma mão APENAS com uma carta devolve o valor da mesma.
 @param MAO Mão apenas com uma carta.
@@ -10,8 +11,8 @@ int returnValuelld (MAO mao){
 
 	int valor, naipe;
 
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
+	for (valor = 12 ; valor >= 0 ; valor--)
+		for (naipe = 3 ; naipe >= 0 ; naipe--)
 			if (carta_existe(mao , naipe , valor)) return valor;
 
 	return -1;
@@ -25,8 +26,8 @@ int returnNaipelld (MAO mao){
 
 	int valor, naipe;
 
-	for (naipe = 0 ; naipe < 4 ; naipe++)
-		for (valor = 0 ; valor < 13 ; valor++)
+	for (valor = 12 ; valor >= 0 ; valor--)
+		for (naipe = 3 ; naipe >= 0 ; naipe--)
 			if (carta_existe(mao , naipe , valor)) return naipe;
 
 	return -1;
@@ -629,7 +630,7 @@ int melhorCombinacao (MAO mao[5], int N){
 @return MAO Mão vazia ou com combinação.
 */
 
-int joga5(JOGO e){
+MAO joga5(JOGO e){
 
 	MAO mao[5] =  {(MAO) 0}; /*Onde serão colocadas todas a jogadas de 5 cartas possíveis*/
 
@@ -772,14 +773,14 @@ MAO jogaPar (MAO mao, int valor, int minNaipe){
 	int counter = 0, flag = 1, naipe;
 	MAO tmp = (MAO) 0;
 
-	for (naipe = 3 ; counter < 2 && naipe < 4 ; naipe--)
+	for (naipe = 3 ; counter < 2 && naipe >= 0 ; naipe--)
 		if (carta_existe(mao , naipe , valor)){
 	 			if (naipe >= minNaipe) flag = 0;
 	 			tmp = add_carta(tmp , naipe , valor);
 				counter++;
 		}
 
-	if (flag && counter != 2) tmp = (MAO) 0;
+	if (flag || counter != 2) tmp = (MAO) 0;
 
 	for (valor++ ; valor < 13 && tmp == (MAO) 0; valor++){
 		for (naipe = counter = 0; naipe < 4 && counter < 2 ; naipe++)
@@ -818,14 +819,14 @@ MAO jogaUma (MAO tmp, int valor, int naipe){
 
 	while (naipe < 4 && mao == (MAO) 0){
 		if (carta_existe(tmp, naipe, valor))
-			add_carta(mao, naipe, valor);
+			mao = add_carta(mao, naipe, valor);
 		naipe++;
 	}
 
 	for (valor++ ; valor < 13 && mao == (MAO) 0 ; valor++)
 		for (naipe = 0 ; naipe < 4 && mao == (MAO) 0 ; naipe++)
 			if (carta_existe(tmp, naipe, valor))
-				add_carta(mao, naipe, valor);
+				mao = add_carta(mao, naipe, valor);
 
 	return mao;
 }
@@ -842,6 +843,100 @@ MAO joga1 (JOGO e){
 	return jogaUma(e->mao, minValue, minNaipe + 1);
 }
 
+/** \brief Abre um jogo, quando não existem cartas em jogo.
+@param JOGO Estado do jogo
+@return MAO Mão do jogo
+*/
+MAO abreJogo (JOGO e){
+
+	/*Primeiro tenta jogar combinações de 5*/
+	MAO maos[5] = {(MAO) 0}, mao = (MAO) 0; 
+
+	int i = 0;
+
+	if (carta_existe(e->mao, 0, 0)){ /*No caso de o 3 de ouros existir na mão*/
+
+		maos[i] = jogaStraight(e, 0, 0);
+
+		if (!carta_existe(maos[i], 0, 0)) maos[i] = (MAO) 0; 
+
+		else i++;
+
+		maos[i] = jogaFlush(e, 0, 0);
+
+		if (!carta_existe(maos[i], 0, 0)) maos[i] = (MAO) 0; 
+
+		else i++; 
+
+		maos[i] = jogaFullHouse(e, 0, 0);
+
+		if (!carta_existe(maos[i], 0, 0)) maos[i] = (MAO) 0; 
+
+		else i++; 
+
+		maos[i] = jogaFourofaKind(e, 0, 0);
+
+		if (!carta_existe(maos[i], 0, 0)) maos[i] = (MAO) 0; 
+
+		else i++; 
+
+		maos[i] = jogaStraightFlush(e, 0, 0);
+
+		if (!carta_existe(maos[i], 0, 0)) maos[i] = (MAO) 0;
+
+		else i++;
+
+		i = melhorCombinacao(maos, i); /*Calcula qual o índice da melhor a ser jogada*/
+
+		mao = maos[i];
+
+		e->nCartas = 5;
+		/*Se não conseguir tenta trio*/
+		if (!carta_existe(mao, 0, 0)) mao = jogaTrio(e->mao, 0), e->nCartas = 3;
+		/*Se não conseguir tenta par*/
+		if (!carta_existe(mao, 0, 0)) mao = jogaPar(e->mao, 0, 0), e->nCartas = 2;
+		/*Se não conseguir tenta uma carta*/
+		if (!carta_existe(mao, 0, 0)) mao = jogaUma(e->mao, 0, 0), e->nCartas = 1;
+
+	}
+
+	else{	
+
+		maos[i] = jogaStraightFlush(e, 0, 0); /*Tenta jogar straight flush*/
+
+		if (maos[i] != (MAO) 0) i++; 
+
+		maos[i] = jogaFourofaKind(e, 0, 0); /*Tenta jogar four of a kind*/
+
+		if (maos[i] != (MAO) 0) i++; 
+
+		maos[i] = jogaFullHouse(e, 0, 0); /*Tenta jogar full house*/
+
+		if (maos[i] != (MAO) 0) i++;
+
+		maos[i] = jogaFlush(e, 0, 0); /*Tenta jogar flush*/
+
+		if (maos[i] != (MAO) 0) i++;
+
+		maos[i] = jogaStraight(e, 0, 0); /*Tenta jogar straight*/
+
+		if (maos[i] != (MAO) 0) i++;
+
+		i = melhorCombinacao(maos, i); /*Calcula qual o índice da melhor a ser jogada*/
+
+		mao = maos[i];
+
+		e->nCartas = 5;
+		/*Se não conseguir tenta trio*/
+		if (mao == (MAO) 0) mao = jogaTrio(e->mao, 0), e->nCartas = 3;
+		/*Se não conseguir tenta par*/
+		if (mao == (MAO) 0) mao = jogaPar(e->mao, 0, 0), e->nCartas = 2;
+		/*Se não conseguir tenta uma carta*/
+		if (mao == (MAO) 0) mao = jogaUma(e->mao, 0, 0), e->nCartas = 1;
+	}
+
+	return mao;
+}
 
 /** \brief Joga.
 @param Jogo e.
@@ -859,12 +954,13 @@ int jogar (JOGO e){
 
 	if (e->nCartas == 1) mao = joga1(e);
 
-
+	if (e->nCartas == 0) mao = abreJogo(e);
 
 	if (mao != (MAO) 0){
 		e->mao = rem_cartas(e->mao, mao);
 		e->played = mao;
 		e->passar = 0;
+		jogaOut(mao, e->nCartas);
 	}
 
 	else{
@@ -874,7 +970,11 @@ int jogar (JOGO e){
 			e->played = (MAO) 0;
 		}
 		else e->passar++; /*Senão o e->passar aumenta*/
+
+		passarOut();
 	}
+
+
 	
 	return 1;
 }

@@ -14,3 +14,5 @@ MAO maoRead (char cards[13][3], int N);
 int readMove (JOGO e, char *action, char cards[13][3], int N);
 
 int readHand (JOGO e, char *action, char cards[13][3], int N);
+
+int readInput (char *action, char cards[13][3]);

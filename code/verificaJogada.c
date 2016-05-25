@@ -91,7 +91,10 @@ int numCartas (MAO sel){
 
 	return nCartas;
 }
-
+/** \brief subsitui os valores de dois elementos do array um pelo outro.
+@param INT Índice do 21º elemento
+@param INT Índice do 2º elemento
+*/
 void swap(int v[], int i, int j){
 
 	int temp;
