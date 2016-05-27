@@ -26,7 +26,7 @@ Ordem das cartas
 
 #define TAM_MAX_ESTADO      1024
 
-#define FORMATO "%lld_%lld_%lld_%lld_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d_%d"
+#define FORMATO "%lld_%lld_%lld_%lld_%lld_%d_%lld_%lld_%lld_%lld_%d_%d_%d_%d_%d"
 
 typedef long long int MAO;
 
@@ -38,7 +38,8 @@ struct state{
    	  jogador, /*jogadr em mao*/
    	  nCartas, /*Numero de cartas em jogo por mão*/
 	  passar, /*Número de vezes consecutivas que o*/
-	  sort; /*Identifca a ordem das minhas cartas*/
+	  sort, /*Identifca a ordem das minhas cartas*/
+	  end; /*Diz se o jogo já acabou ou não*/
 };
 
 

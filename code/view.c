@@ -38,7 +38,7 @@ void imprime_carta(int x, int y, ESTADO e , int m , int naipe, int valor){
 	if (carta_existe (e.selecao , naipe , valor)) y -= 30; /*Sobe as cartas seleccionadas*/
 	
 
-	if (m == 3 && e.jogador == 3){ /*Adiciona e retira cartas do e.seleccao e imprime tudo*/
+	if (m == 3 && e.jogador == 3 && e.end == 0){ /*Adiciona e retira cartas do e.seleccao e imprime tudo*/
 		if (carta_existe (e.selecao , naipe , valor)) e.selecao = rem_carta (e.selecao , naipe , valor);
 		else e.selecao = add_carta(e.selecao , naipe , valor);
 
@@ -110,43 +110,56 @@ void imprime_botoes (int x , int y, ESTADO e){
 	char script[10240];
 
 	e.action = 4;
+
+	if (e.end == 0){
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "help.png");
+	}
+
+	else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "help.png");
 
 	y+=100;
 	e.action = 2;
 
-		if (verificaJogada (e)){
+	if (verificaJogada (e) && e.end == 0){
 
-			sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-			printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
-		}
+		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "play.png");
+	}
 
-		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
+	else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "play.png");
 
 	y += 100;
 
 	e.action = 3;
-		if (e.nCartas != 0){
+
+	if (e.nCartas != 0 && e.end == 0){
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "pass.png");
-		}
-		else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "pass.png");
+	}
+
+	else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "pass.png");
 
 	y += 100;
 
+
 	e.action = 1;
-		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
-		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
+
+	sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "shuffle.png");
 
 	e.action = 0;
 	y += 100;
 
 	if (e.sort == 1) e.sort = 0;
 	else e.sort++;
+
+	if (e.end == 0){
 		sprintf(script, "%s?%s" , SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" /></a>\n", script, x, y, BARALHO, "sort.png");
+	}
 
+	else printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%s\" />\n", x, y, BARALHO, "sort.png");
 
 }
 
@@ -161,6 +174,12 @@ void imprime_passar (int n){
 
 }
 
+void imprime_fim (int n){
+
+	printf("<text x=\"100\" y=\"250\" fill=\"black\" font-size=\"80\">O jogador %d ganhou!</text>", n);
+
+}
+
 
 /** \brief Imprime o estado
 
@@ -170,9 +189,12 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 */
 void imprime(ESTADO e){
 
+	int i;
 
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
+
+
 
 
 	if (e.action == 1){ /*BARALHAR*/
@@ -222,6 +244,12 @@ void imprime(ESTADO e){
 	}
 
 	e.played[3] = (MAO) 0;
+
+	for (i = 0 ; i < 4 && e.mao[i] != (MAO) 0 ; i++); /*Verifica se algum jogador já acabou*/
+	if (i < 4){
+		e.end = i;
+		imprime_fim(e.end);
+	}
 
 	imprime_mao (190 , 010 , e , e.mao[0] , 0);
 	imprime_mao (390 , 010 , e , e.mao[1] , 1);

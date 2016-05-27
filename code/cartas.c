@@ -118,7 +118,7 @@ ESTADO shuffle (ESTADO e){
 */
 ESTADO str2estado (char* str){
 	ESTADO e;
-	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.passar, &e.sort);
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.selecao, &e.action , &e.played[0] , &e.played[1] , &e.played[2] , &e.played[3], &e.jogador, &e.nCartas, &e.passar, &e.sort, &e.end);
 	return e;
 }
 
@@ -127,7 +127,7 @@ ESTADO str2estado (char* str){
 */
 char* estado2str (ESTADO e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.passar, e.sort);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.selecao, e.action , e.played[0] , e.played[1] , e.played[2] , e.played[3], e.jogador, e.nCartas, e.passar, e.sort, e.end);
 	return res;
 }
 
@@ -148,6 +148,7 @@ ESTADO inicializa (ESTADO e){
     e.selecao = 0;
     e.passar = 0;
     e.sort = 0;
+    e.end = 0;
 
     return e;
 }
