@@ -50,4 +50,8 @@ MAO addStraight (MAO mao, int naipe, int valor);
 
 MAO jogaStraight (JOGO e, int naipe, int valor);
 
+MAO joga5(JOGO e);
+
+MAO abreJogo (JOGO e);
+
 int jogar (JOGO e);

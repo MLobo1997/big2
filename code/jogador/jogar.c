@@ -835,23 +835,24 @@ MAO joga2 (JOGO e){
 }
 
 /** \brief Joga 1 cartas conforme o jogo.
+@param JOGO Estado do jogo atual.
 @param INT Valor mínimo a ser jogado.
 @param INT Naipe mínimo a ser jogado.
 @return MAO Mão vazia ou com uma carta.
 */
-MAO jogaUma (MAO tmp, int valor, int naipe){
+MAO jogaUma (JOGO e, int valor, int naipe){
 
 	MAO mao = (MAO) 0;
 
 	while (naipe < 4 && mao == (MAO) 0){
-		if (carta_existe(tmp, naipe, valor))
+		if (carta_existe(e->mao, naipe, valor) && !carta_existe(e->bestCombo, naipe, valor))
 			mao = add_carta(mao, naipe, valor);
 		naipe++;
 	}
 
 	for (valor++ ; valor < 13 && mao == (MAO) 0 ; valor++)
 		for (naipe = 0 ; naipe < 4 && mao == (MAO) 0 ; naipe++)
-			if (carta_existe(tmp, naipe, valor))
+			if (carta_existe(e->mao, naipe, valor) && !carta_existe(e->bestCombo, naipe, valor))
 				mao = add_carta(mao, naipe, valor);
 
 	return mao;
@@ -866,7 +867,7 @@ MAO joga1 (JOGO e){
 	int minValue = returnValuelld(e->played);
 	int minNaipe = returnNaipelld(e->played); 
 
-	return jogaUma(e->mao, minValue, minNaipe + 1);
+	return jogaUma(e, minValue, minNaipe + 1);
 }
 
 /** \brief Abre um jogo, quando não existem cartas em jogo.
@@ -922,7 +923,7 @@ MAO abreJogo (JOGO e){
 		/*Se não conseguir tenta par*/
 		if (!carta_existe(mao, 0, 0)) mao = jogaPar(e->mao, 0, 0), e->nCartas = 2;
 		/*Se não conseguir tenta uma carta*/
-		if (!carta_existe(mao, 0, 0)) mao = jogaUma(e->mao, 0, 0), e->nCartas = 1;
+		if (!carta_existe(mao, 0, 0)) mao = jogaUma(e, 0, 0), e->nCartas = 1;
 
 	}
 
@@ -958,14 +959,14 @@ MAO abreJogo (JOGO e){
 		/*Se não conseguir tenta par*/
 		if (mao == (MAO) 0) mao = jogaPar(e->mao, 0, 0), e->nCartas = 2;
 		/*Se não conseguir tenta uma carta*/
-		if (mao == (MAO) 0) mao = jogaUma(e->mao, 0, 0), e->nCartas = 1;
+		if (mao == (MAO) 0) mao = jogaUma(e, 0, 0), e->nCartas = 1;
 	}
 
 	return mao;
 }
 
 /** \brief Joga.
-@param Jogo e.
+@param Jogo Estado do jogo atual.
 @return	1 se a carta existe e 0 caso contrário.
 */
 int jogar (JOGO e){
@@ -987,6 +988,8 @@ int jogar (JOGO e){
 		e->played = mao;
 		e->passar = 0;
 		jogaOut(mao, e->nCartas);
+
+		if ((e->bestCombo & mao) != (MAO) 0) e->bestCombo = 0; /*No caso de ter sido jogada alguma carta do bestCombo este é eliminado*/
 	}
 
 	else{

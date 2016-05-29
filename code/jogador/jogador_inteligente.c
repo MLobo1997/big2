@@ -84,6 +84,7 @@ int initiate (JOGO e){
 
 	e->played = (MAO) 0;
 	e->mao = (MAO) 0;
+	e->bestCombo = (MAO) 0;
 	e->passar = 0;
 	e->nCartas = 0;
 

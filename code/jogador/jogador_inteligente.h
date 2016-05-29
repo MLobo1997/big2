@@ -8,7 +8,8 @@ typedef long long int MAO;
 typedef struct jogo{
 
 	MAO played, /*identifa a ultima mao jogada*/
-		mao; /*Minha mão*/
+		mao, /*Minha mão*/
+		bestCombo; /*Melhor combinação*/
 	int	passar, /*identifica a sequencia de passagem*/
 		nCartas; /*Número de cartas a ser jogadas*/
 

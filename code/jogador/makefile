@@ -10,4 +10,4 @@ debug:
 		gcc -Wall -Wextra -pedantic -Wno-long-long -g *.c -o jogador_inteligente -lm
 
 limpar:
-		rm $(EXEC) *.o
+		rm *.o

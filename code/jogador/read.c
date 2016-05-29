@@ -103,8 +103,15 @@ int readAction (JOGO e, char *action){
 
 int readHand (JOGO e, char *action, char cards[13][3], int N){
 
+	MAO tmp = (MAO) 0;
+
 	if (strcmp(action, "MAO") == 0)
 	e->mao = maoRead(cards, N - 1);
+
+	tmp = abreJogo(e);
+	e->nCartas = 0;
+
+	if (numCartas(tmp) == 5) e->bestCombo = tmp;
 
 	return 1;
 }

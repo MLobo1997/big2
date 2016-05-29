@@ -20,7 +20,6 @@ int main (){
 
 		n = readInput(action, cards);
 		/*A variável n identifica o número de palavras que foram lidas o scanf é executado até ler alguma coisa*/
-		n = n;
 
 		if (n == 1) readAction(e, action); /*se só tem um comando*/
 
