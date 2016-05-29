@@ -615,14 +615,39 @@ CARTA straightValue (MAO mao, CARTA card){
 	return card;
 }
 
+/** \brief Recebe uma MAO e dá a média geométrica tendo em conta os valores e os naipes das cartas
+@param MAO A mão da qual queremos a média.
+@return DOUBLE A média geométrica da mão.
+*/
+double mediaMao (MAO mao){
+
+	int valor, naipe; double soma,isoma; soma = 1; isoma = 0;
+
+	for (naipe = 0 ; naipe < 4 ; naipe++){
+		for (valor = 0 ; valor < 13 ; valor++){
+			if (carta_existe(mao , naipe , valor)) {
+				soma *=(valor)+((naipe+1)*0.25);
+				isoma++;
+			}
+		}
+	}
+	return (pow(soma,(1/isoma))); /*Média geométrica*/
+}
+
 /** \brief Calcula de várias mãos a que tem uma média de valores mais baixa.
 @param ARRAY Array de no máximo de 5 mãos.
 @param INT Número de arrays.
 @return INT Índice do elemento do array com média de valores mais baixa.
 */
 int melhorCombinacao (MAO mao[5], int N){
+	double valor = 12;
+	int i, r = 0;
 
-	return 0;
+	for(i = 0 ; i < N ; i++)
+		if (mediaMao(mao[i]) < valor)
+			valor = mediaMao(mao[i]), r = i;
+
+	return r;
 }
 
 /** \brief	Tenta fazer a jogada de 5 cartas com valores mais baixos possível.
