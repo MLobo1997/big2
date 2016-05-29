@@ -63,6 +63,12 @@ int naipeAnterior (int * naipe){
 	return *naipe;
 }
 
+/** \brief Verifica se é possível formar um straight flush a partir de uma determinada carta.
+@param MAO Mão a ser analisada.
+@param INT Naipe a verificar.
+@param INT Valor a partir do qual se vai verificar o straight flush (assumindo que é o máximo).
+@return INT 1 caso possível, 0 caso contrário.
+*/
 int hasStraightFlush (MAO mao, int naipe, int valor){
 
 	return (carta_existe (mao , naipe , valor) &&
@@ -71,7 +77,12 @@ int hasStraightFlush (MAO mao, int naipe, int valor){
 			carta_existe (mao , naipe , valorAnterior(&valor)) &&
 			carta_existe (mao , naipe , valorAnterior(&valor)));
 }
-
+/** \brief Adiciona um straight flush a partir de uma determinada carta.
+@param MAO Mão a ser alterada.
+@param INT Naipe a adicionar.
+@param INT Valor a partir do qual se vai verificar o straight flush (assumindo que é o máximo).
+@return MAO Mão alterada.
+*/
 MAO add_StraightFlush (MAO mao, int naipe, int valor){
 
 	mao = add_carta (mao , naipe , valor);
@@ -82,7 +93,12 @@ MAO add_StraightFlush (MAO mao, int naipe, int valor){
 
 	return mao;
 }
-
+/** \brief Tenta jogar um Straight Flush.
+@param JOGO Estado do jogo.
+@param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
+@param VALOR Valor mínimo a ser jogado.
+@return MAO Mão vazia ou com straight flush.
+*/
 ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 
 
@@ -107,6 +123,12 @@ ESTADO jogaStraightFlush (ESTADO e , int naipe, int valor){
 
 }
 
+
+/** \brief Adiciona um four of a kind.
+@param MAO Mão a ser alterada.
+@param INT Valor a ser adicionado.
+@return MAO Mão já alterada.
+*/
 MAO add_FourofaKind (MAO mao, int valor){
 	mao = add_carta (mao , 0 , valor);
 	mao = add_carta (mao , 1 , valor);
@@ -119,6 +141,12 @@ MAO add_FourofaKind (MAO mao, int valor){
 
 }
 
+
+/** \brief Adiciona a carta mais baixa da mão.
+@param MAO Mão a ser retirada carta.
+@param MAO Mão a ser adicionada a carta.
+@return MAO Mão já alterada.
+*/
 MAO add_valormaisbaixo (MAO mao,MAO maoplayed){
 
 	int valor = 0, naipe = 0;
@@ -134,7 +162,12 @@ MAO add_valormaisbaixo (MAO mao,MAO maoplayed){
 	return maoplayed;
 }
 
-
+/** \brief Tenta jogar um four of a kind.
+@param JOGO Estado do jogo.
+@param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
+@param VALOR Valor mínimo a ser jogado.
+@return MAO Mão vazia ou com four of a kind.
+*/
 ESTADO jogaFourofaKind (ESTADO e, int naipe, int valor){
 
 	int numc = numCartas (e.mao[e.jogador]); /* redundante?*/
@@ -159,6 +192,13 @@ ESTADO jogaFourofaKind (ESTADO e, int naipe, int valor){
 
 }
 
+/** \brief Calcula o menor valor superior para um determinado four of a kind.
+@param MAO Four of a kind a ser analisada.
+@param CARTA transportadora de resultado.
+@return CARTA Valor e naipe mínimo a ser jogado.
+*/
+
+
 CARTA fourOfAKindValue (MAO mao, CARTA card){
 
 	int valor, naipe, counter = 0;
@@ -172,6 +212,11 @@ CARTA fourOfAKindValue (MAO mao, CARTA card){
 	return card;
 }
 
+/** \brief Verifica se uma determinada jogada é um four of a kind.
+@param MAO jogada de 5 cartas.
+@return BOOL 1 caso a jogada seja um four of a kind, 0 caso contrário.
+*/
+
 int isFourOfAKind (MAO mao){
 
 	int valor, naipe, counter = 0;
@@ -182,6 +227,13 @@ int isFourOfAKind (MAO mao){
 	return (counter == 4);
 
 }
+
+/** \brief Tenta jogar um full house.
+@param JOGO Estado do jogo.
+@param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
+@param VALOR Valor mínimo a ser jogado.
+@return MAO Mão vazia ou com full house.
+*/
 
 ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 
@@ -223,6 +275,11 @@ ESTADO jogaFullHouse(ESTADO e, int naipe, int valor){ /* (3,2) do mm valor */
 	return e;
 }
 
+/** \brief Verifica se uma determinada jogada é um full house.
+@param MAO jogada de 5 cartas.
+@return BOOL 1 caso a jogada seja um full house, 0 caso contrário.
+*/
+
 int isFullHouse (MAO mao){
 
 	int i = 0, valores[5], valor, naipe;
@@ -241,6 +298,12 @@ int isFullHouse (MAO mao){
 			 valores[3] == valores[4]));
 
 }
+
+/** \brief Calcula o menor valor superior para um determinado full house.
+@param MAO Full house a ser analisada.
+@param CARTA transportadora de resultado.
+@return CARTA Valor e naipe mínimo a ser jogado.
+*/
 
 CARTA fullHouseValue(MAO mao, CARTA card){
 
