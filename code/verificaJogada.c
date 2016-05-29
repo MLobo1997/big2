@@ -52,7 +52,7 @@ int returnNaipe (char carta[4]){
 }
 
 /** \brief Coloca num array strings com o formato "(valor)_(naipe)" e devolve o número de strings colocadas
-@param MATRIZ poderá ter até 56 cartas (strings de 3 elementos).
+@param MATRIZ poderá ter até 56 cartas (strings de 3 elementos: "(valor)_(naipe)").
 @param MAO O long long int que será lido.
 @return NUM número de cartas.
 */
@@ -157,6 +157,11 @@ int verificaSeguidos (int n1 , int n2){
 	return flag;
 }
 
+/** \brief Verifica se uma determinada jogada é uma sequência.
+@param MATRIZ com uma mão (strings de 3 elementos: "(valor)_(naipe)").
+@return BOOL 1 caso a jogada seja uma sequência, 0 caso contrário.
+*/
+
 int sequencia (char cartas[4][56]){
 
 	int valores[5], tmp[5];
@@ -188,6 +193,11 @@ int sequencia (char cartas[4][56]){
 	return flag;
 }
 
+/** \brief Verifica se uma determinada jogada é um flush.
+@param MATRIZ com uma mão (strings de 3 elementos: "(valor)_(naipe)").
+@return BOOL 1 caso a jogada seja um flush, 0 caso contrário.
+*/
+
 int flush (char cartas[4][56]){
 
 	int naipes[5], i;
@@ -199,6 +209,12 @@ int flush (char cartas[4][56]){
 
 	return (i == 4);
 }
+
+
+/** \brief Verifica se uma determinada jogada é um four of a kind ou um fullhouse.
+@param MATRIZ com uma mão (strings de 3 elementos: "(valor)_(naipe)").
+@return BOOL 1 caso a jogada seja um four of a kind ou um fullhouse, 0 caso contrário.
+*/
 
 int fullAndfour (char cartas[4][56]){ 
 
@@ -215,6 +231,12 @@ int fullAndfour (char cartas[4][56]){
 			(ranks[0] == ranks[1] && ranks[1] == ranks[2] && ranks[3] == ranks[4]));
 }
 
+
+
+/** \brief Verifica se uma determinada jogada é valida
+@param ESTADO recebe o estado atual
+@return INT indica qual foi o último jogador a jogar (entre 0 e 3)
+*/ 
 int previousPlayer (ESTADO *e){
 
 	int n = e->jogador; 
@@ -250,6 +272,12 @@ int cartaMaior (char carta1[4] , char carta2[4]){
 	return flag; 
 }
 
+/** \brief Verifica se é possível jogar um par tendo em conta a jogada anterior.
+@param MATRIZ com a mão atual (strings de 3 elementos: "(valor)_(naipe)").
+@param MATRIZ com a mão anterior (strings de 3 elementos: "(valor)_(naipe)").
+@return BOOL 1 caso a jogada seja possivel jogar um par, 0 caso contrário.
+*/
+
 int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 	char maior[4], valorAnterior[4];
@@ -272,6 +300,12 @@ int verificaDuas (char cartas[4][56] , char cartasAnteriores[4][56]){
 
 	return flag;
 }
+
+/** \brief Verifica se é possível jogar um trio tendo em conta a jogada anterior.
+@param MATRIZ com a mão atual (strings de 3 elementos: "(valor)_(naipe)").
+@param MATRIZ com a mão anterior (strings de 3 elementos: "(valor)_(naipe)").
+@return BOOL 1 caso a jogada seja possivel jogar um trio, 0 caso contrário.
+*/
 
 int verificaTres (char cartas[4][56] , char cartasAnteriores[4][56]){ 
 	char maior[4], valorAnterior[4];
