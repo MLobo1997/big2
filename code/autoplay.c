@@ -94,7 +94,7 @@ MAO add_StraightFlush (MAO mao, int naipe, int valor){
 	return mao;
 }
 /** \brief Tenta jogar um Straight Flush.
-@param JOGO Estado do jogo.
+@param ESTADO Estado do jogo.
 @param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
 @param VALOR Valor mínimo a ser jogado.
 @return MAO Mão vazia ou com straight flush.
@@ -163,7 +163,7 @@ MAO add_valormaisbaixo (MAO mao,MAO maoplayed){
 }
 
 /** \brief Tenta jogar um four of a kind.
-@param JOGO Estado do jogo.
+@param ESTADO Estado do jogo.
 @param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
 @param VALOR Valor mínimo a ser jogado.
 @return MAO Mão vazia ou com four of a kind.
@@ -229,7 +229,7 @@ int isFourOfAKind (MAO mao){
 }
 
 /** \brief Tenta jogar um full house.
-@param JOGO Estado do jogo.
+@param ESTADO Estado do jogo.
 @param NAIPE Naipe mínimo que pode ser jogado dentro do valor.
 @param VALOR Valor mínimo a ser jogado.
 @return MAO Mão vazia ou com full house.
@@ -584,7 +584,7 @@ ESTADO autoplay (ESTADO e){
 			if (e.played[e.jogador] != (MAO) 0) e.nCartas = 5;
 		}
 
-		for (valor = 0 ; valor < 13 && e.played[e.jogador] == (MAO) 0; valor++)				
+		for (valor = 0 ; valor < 13 && e.played[e.jogador] == (MAO) 0; valor++)	 /*tenta jogar uma carta*/			
 			for (naipe = 0 ; naipe < 4 && e.played[e.jogador] == (MAO) 0 ; naipe++)				
 				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 
@@ -605,15 +605,15 @@ ESTADO autoplay (ESTADO e){
 
 		proceder = 1;
 
-		for (naipe = minNaipe, valor = minValue ; naipe < 4 && proceder ; naipe++)
+		for (naipe = minNaipe, valor = minValue ; naipe < 4 && proceder ; naipe++) /*tenta jogar uma carta dentro do mesmo valor*/
 					if (carta_existe (e.mao[e.jogador] , naipe , valor)){
-					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
-					e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor); 
-					proceder = 0;
-					flag = 0;
+						e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
+						e.mao[e.jogador] = rem_carta(e.mao[e.jogador] , naipe , valor); 
+						proceder = 0;
+						flag = 0;
 					}
 
-		for (valor = ++minValue ; valor < 13 && proceder ; valor++)
+		for (valor = ++minValue ; valor < 13 && proceder ; valor++) /*tenta jogar uma carta de um valor superior*/
 			for (naipe = 0 ; naipe < 4 && proceder ; naipe++)
 				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 					e.played[e.jogador] = add_carta(e.played[e.jogador] , naipe , valor);
@@ -623,27 +623,27 @@ ESTADO autoplay (ESTADO e){
 				}
 	}
 
-	if (e.nCartas == 2 && flag){
+	if (e.nCartas == 2 && flag){ /*Se tiverem em jogo mão de duas cartas*/
 
 		maoAnterior = e.played[previousPlayer(&e)];
 		minValue = returnValuelld (maoAnterior);
 		minNaipe = returnNaipelld (maoAnterior);
 
-		for (valor = minValue + 1 ; valor < 13 && count < 2 ; valor++)
+		for (valor = minValue + 1 ; valor < 13 && count < 2 ; valor++) /*Tenta jogar um par*/
 			for (naipe = count = 0 , e.played[e.jogador] = (MAO) 0 ; naipe < 4 && count < 2 ; naipe++)
 				if (carta_existe (e.mao[e.jogador] , naipe , valor)){
 					count++;
 					e.played[e.jogador] = add_carta (e.played[e.jogador] , naipe , valor);
 				}
 
-		if (count == 2) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]), flag = 0;
+		if (count == 2) e.mao[e.jogador] = rem_cartas(e.mao[e.jogador] , e.played[e.jogador]), flag = 0; /*Se tiver jogado, retira o da mão*/
 
 		else e.played[e.jogador] = (MAO) 0;
 
 
 	}
 
-	if (e.nCartas == 3 && flag){
+	if (e.nCartas == 3 && flag){ /*Se tiverem em jogo mão de 3 cartas*/
 
 		maoAnterior = e.played[previousPlayer(&e)];
 		minValue = returnValuelld (maoAnterior);
@@ -663,11 +663,11 @@ ESTADO autoplay (ESTADO e){
 
 	if (e.nCartas == 5 && flag){
 
-		MAO	maoAnterior = e.played[previousPlayer(&e)];
+		MAO	maoAnterior = e.played[previousPlayer(&e)]; /*Calcula a ultma mao jogada*/
 
 		CARTA card;
 
-		if (isStraight(maoAnterior) && isFlush(maoAnterior)){ /*StraightFlush*/
+		if (isStraight(maoAnterior) && isFlush(maoAnterior)){ /*se for StraightFlush*/
 
 			card = straightValue(maoAnterior, card);
 
@@ -676,7 +676,7 @@ ESTADO autoplay (ESTADO e){
 			if (e.played[e.jogador] != (MAO) 0) flag = 0; 
 		}
 
-	    if (flag && isFourOfAKind(maoAnterior)){
+	    if (flag && isFourOfAKind(maoAnterior)){ /*Se for four of a kind*/
 
 			card = fourOfAKindValue(maoAnterior, card);
 
@@ -689,7 +689,7 @@ ESTADO autoplay (ESTADO e){
 	    	if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
-		if (flag && isFullHouse(maoAnterior)){
+		if (flag && isFullHouse(maoAnterior)){ /*Se for fullhouse*/
 
 			card = fullHouseValue(maoAnterior, card);
 
@@ -706,7 +706,7 @@ ESTADO autoplay (ESTADO e){
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
-		if (flag && isFlush(maoAnterior) && !isStraight(maoAnterior)){
+		if (flag && isFlush(maoAnterior) && !isStraight(maoAnterior)){ /*Se for flush*/
 
 			card = flushValue(maoAnterior, card);
 
@@ -727,7 +727,7 @@ ESTADO autoplay (ESTADO e){
 			if (e.played[e.jogador] != (MAO) 0) flag = 0;
 		}
 
-		if (flag && isStraight(maoAnterior) && !isFlush(maoAnterior)){
+		if (flag && isStraight(maoAnterior) && !isFlush(maoAnterior)){ /*Se for straight*/
 
 			card = straightValue(maoAnterior, card);
 
